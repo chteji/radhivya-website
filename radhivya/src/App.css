@@ -1,0 +1,804 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap");
+
+:root {
+  --rv-bg: #f8f1e7;
+  --rv-bg-soft: #fffaf3;
+  --rv-card: rgba(255, 250, 243, 0.82);
+  --rv-white: #ffffff;
+
+  --rv-primary: #15110d;
+  --rv-primary-dark: #080705;
+  --rv-primary-soft: #2a2118;
+
+  --rv-gold: #c89b5c;
+  --rv-gold-light: #f2d6a3;
+  --rv-bronze: #9b6b3f;
+  --rv-muted: #7a6a58;
+
+  --rv-border: rgba(200, 155, 92, 0.24);
+  --rv-shadow: 0 28px 90px rgba(21, 17, 13, 0.14);
+  --rv-shadow-hover: 0 38px 110px rgba(21, 17, 13, 0.24);
+
+  --rv-radius-sm: 12px;
+  --rv-radius-md: 18px;
+  --rv-radius-lg: 28px;
+  --rv-radius-xl: 42px;
+
+  --rv-transition: 0.32s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(242, 214, 163, 0.34), transparent 34%),
+    radial-gradient(circle at 90% 10%, rgba(200, 155, 92, 0.22), transparent 34%),
+    radial-gradient(circle at 50% 100%, rgba(21, 17, 13, 0.08), transparent 35%),
+    linear-gradient(135deg, #fffaf3 0%, #f8f1e7 48%, #efe3d1 100%);
+  color: var(--rv-primary);
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(200, 155, 92, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 155, 92, 0.075) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+  z-index: -2;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -30%;
+  pointer-events: none;
+  background:
+    conic-gradient(
+      from 180deg,
+      transparent,
+      rgba(242, 214, 163, 0.16),
+      transparent,
+      rgba(200, 155, 92, 0.12),
+      transparent
+    );
+  animation: globalLuxurySpin 28s linear infinite;
+  z-index: -3;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  transition:
+    transform var(--rv-transition),
+    box-shadow var(--rv-transition),
+    background var(--rv-transition),
+    border-color var(--rv-transition);
+}
+
+button:hover {
+  transform: translateY(-3px);
+}
+
+img {
+  max-width: 100%;
+}
+
+.rv-page {
+  min-height: 100vh;
+}
+
+.rv-container {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.rv-glass {
+  background: rgba(255, 250, 243, 0.78);
+  border: 1px solid var(--rv-border);
+  border-radius: var(--rv-radius-lg);
+  box-shadow: var(--rv-shadow);
+  backdrop-filter: blur(22px);
+}
+
+.rv-title {
+  color: var(--rv-primary);
+  font-family: "Playfair Display", serif;
+  font-weight: 900;
+  line-height: 0.98;
+}
+
+.rv-eyebrow {
+  color: var(--rv-bronze);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rv-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 15px 24px;
+  border: none;
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, #15110d 0%, #2a2118 48%, #c89b5c 140%);
+  color: white;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 18px 42px rgba(21, 17, 13, 0.24);
+}
+
+.rv-btn-primary:hover {
+  box-shadow: 0 26px 60px rgba(21, 17, 13, 0.34);
+}
+
+.rv-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 15px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--rv-border);
+  background: rgba(255, 250, 243, 0.86);
+  color: var(--rv-primary);
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rv-card-hover {
+  transition:
+    transform var(--rv-transition),
+    box-shadow var(--rv-transition),
+    border-color var(--rv-transition);
+}
+
+.rv-card-hover:hover {
+  transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: var(--rv-shadow-hover);
+  border-color: rgba(200, 155, 92, 0.42);
+}
+
+@keyframes rvFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rvFloat {
+  0% {
+    transform: translateY(0) rotateX(0deg) rotateY(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotateX(8deg) rotateY(-10deg);
+  }
+
+  100% {
+    transform: translateY(0) rotateX(0deg) rotateY(0deg);
+  }
+}
+
+@keyframes rvGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(200, 155, 92, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 55px rgba(200, 155, 92, 0.28);
+  }
+
+  100% {
+    box-shadow: 0 0 0 rgba(200, 155, 92, 0);
+  }
+}
+
+@keyframes globalLuxurySpin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+
+  to {
+    transform: rotate(360deg) scale(1.08);
+  }
+}
+
+.rv-animate-up {
+  animation: rvFadeUp 0.8s ease both;
+}
+
+.rv-float {
+  animation: rvFloat 5s ease-in-out infinite;
+}
+
+.rv-glow {
+  animation: rvGlow 3.5s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f1e7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#15110d, #c89b5c);
+  border-radius: 999px;
+}
+
+::selection {
+  background: #15110d;
+  color: #f2d6a3;
+}
+
+@media (max-width: 768px) {
+  .rv-container {
+    width: min(100% - 24px, 1180px);
+  }
+
+  button:hover {
+    transform: none;
+  }
+}
+/* =========================
+   GLOBAL BLACK/GOLD THEME OVERRIDES
+   Converts old purple/pink pages to luxury black/gold
+========================= */
+
+.about-page,
+.contact-page,
+.wishlist-page,
+.cart-page,
+.checkout-page,
+.payment-page,
+.invoice-page,
+.profile-page,
+.auth-page,
+.admin-page,
+.staff-page {
+  background:
+    radial-gradient(circle at 10% 8%, rgba(242, 214, 163, 0.28), transparent 30%),
+    radial-gradient(circle at 88% 12%, rgba(200, 155, 92, 0.18), transparent 34%),
+    linear-gradient(135deg, #fffaf3 0%, #f8f1e7 48%, #efe3d1 100%) !important;
+  color: #15110d !important;
+}
+
+.about-page h1,
+.about-page h2,
+.about-page h3,
+.contact-page h1,
+.contact-page h2,
+.contact-page h3,
+.wishlist-page h1,
+.wishlist-page h2,
+.wishlist-page h3,
+.cart-page h1,
+.cart-page h2,
+.cart-page h3,
+.checkout-page h1,
+.checkout-page h2,
+.checkout-page h3,
+.payment-page h1,
+.payment-page h2,
+.payment-page h3,
+.invoice-page h1,
+.invoice-page h2,
+.invoice-page h3,
+.profile-page h1,
+.profile-page h2,
+.profile-page h3,
+.auth-page h1,
+.auth-page h2,
+.auth-page h3,
+.admin-page h1,
+.admin-page h2,
+.admin-page h3,
+.staff-page h1,
+.staff-page h2,
+.staff-page h3 {
+  color: #15110d !important;
+}
+
+.about-page span,
+.contact-page span,
+.wishlist-page span,
+.cart-page span,
+.checkout-page span,
+.payment-page span,
+.invoice-page span,
+.profile-page span,
+.auth-page span {
+  border-color: rgba(200, 155, 92, 0.24);
+}
+
+.about-page p,
+.contact-page p,
+.wishlist-page p,
+.cart-page p,
+.checkout-page p,
+.payment-page p,
+.invoice-page p,
+.profile-page p,
+.auth-page p,
+.admin-page p,
+.staff-page p {
+  color: #7a6a58;
+}
+
+.about-page a,
+.contact-page a,
+.wishlist-page a,
+.cart-page a,
+.checkout-page a,
+.payment-page a,
+.invoice-page a,
+.profile-page a,
+.auth-page a {
+  color: #15110d;
+}
+
+.about-primary-btn,
+.arrival-primary-btn,
+.checkout-btn,
+.auth-main-btn,
+.save-product-btn,
+.staff-form button,
+.admin-topbar button,
+.staff-topbar button {
+  background: linear-gradient(135deg, #15110d, #2a2118) !important;
+  color: #f2d6a3 !important;
+  border-color: rgba(200, 155, 92, 0.28) !important;
+}
+
+.about-secondary-btn,
+.arrival-secondary-btn,
+.auth-secondary-btn {
+  background: rgba(255, 250, 243, 0.82) !important;
+  color: #15110d !important;
+  border: 1px solid rgba(200, 155, 92, 0.25) !important;
+}
+
+.about-visual,
+.story-content,
+.value-card,
+.process-card,
+.trust-card,
+.about-cta,
+.contact-card,
+.contact-form-card,
+.wishlist-card,
+.cart-card,
+.summary-card,
+.profile-main-card,
+.profile-sidebar,
+.auth-form-panel,
+.admin-form-card,
+.admin-list-card,
+.staff-card,
+.staff-stat-card,
+.support-ticket-card,
+.customer-card,
+.task-card,
+.influencer-card,
+.social-card {
+  background: rgba(255, 250, 243, 0.82) !important;
+  border: 1px solid rgba(200, 155, 92, 0.22) !important;
+  box-shadow: 0 28px 90px rgba(21, 17, 13, 0.12) !important;
+  backdrop-filter: blur(20px);
+}
+
+.philosophy-band,
+.story-card,
+.admin-sidebar,
+.staff-sidebar,
+.premium-footer {
+  background:
+    radial-gradient(circle at top right, rgba(200, 155, 92, 0.22), transparent 34%),
+    linear-gradient(135deg, #080705, #15110d 60%, #2a2118) !important;
+  color: #fffaf3 !important;
+}
+
+.philosophy-band h2,
+.story-card h2,
+.admin-sidebar h2,
+.staff-sidebar h2 {
+  color: #f2d6a3 !important;
+}
+
+.value-icon,
+.arrival-category-icon,
+.profile-avatar,
+.upload-placeholder,
+.product-image-box,
+.wishlist-img,
+.cart-item-img {
+  background: linear-gradient(145deg, #fffaf3, #f2d6a3) !important;
+}
+
+button,
+a,
+.value-card,
+.process-card,
+.trust-card,
+.wishlist-card,
+.cart-item,
+.profile-stat,
+.admin-product-row,
+.staff-stat-card,
+support-ticket-card {
+  transition: 0.32s ease;
+}
+
+.value-card:hover,
+.process-card:hover,
+.trust-card:hover,
+.wishlist-card:hover,
+.cart-item:hover,
+.profile-stat:hover,
+.admin-product-row:hover,
+.staff-stat-card:hover,
+.support-ticket-card:hover,
+.customer-card:hover,
+.task-card:hover,
+.influencer-card:hover,
+.social-card:hover {
+  transform: translateY(-8px) rotateX(2deg);
+  box-shadow: 0 36px 110px rgba(21, 17, 13, 0.2) !important;
+}
+
+/* =========================
+   FINAL BLACK / GOLD COLOR FIX
+   Removes old purple/pink colors from shop + new arrivals + home
+========================= */
+
+:root {
+  --luxury-black: #15110d;
+  --luxury-deep: #080705;
+  --luxury-gold: #c89b5c;
+  --luxury-light-gold: #f2d6a3;
+  --luxury-ivory: #fffaf3;
+  --luxury-soft: #f8f1e7;
+  --luxury-muted: #7a6a58;
+  --luxury-border: rgba(200, 155, 92, 0.25);
+}
+
+/* MAIN TEXT FIX */
+.home-premium-page h1,
+.home-premium-page h2,
+.home-premium-page h3,
+.premium-products-page h1,
+.premium-products-page h2,
+.premium-products-page h3,
+.premium-arrivals-page h1,
+.premium-arrivals-page h2,
+.premium-arrivals-page h3,
+.premium-detail-page h1,
+.premium-detail-page h2,
+.premium-detail-page h3,
+.products-hero h1,
+.arrivals-hero h1,
+.arrival-section-head h2,
+.premium-product-info h3,
+.arrival-card-body h3,
+.premium-detail-info h1 {
+  color: var(--luxury-black) !important;
+}
+
+/* SMALL GOLD TEXT */
+.hero-eyebrow,
+.products-hero span,
+.arrivals-hero span,
+.arrival-section-head span,
+.product-category,
+.arrival-card-body small,
+.section-head span,
+.story-card span {
+  color: #9b6b3f !important;
+}
+
+/* PARAGRAPH TEXT */
+.home-premium-page p,
+.premium-products-page p,
+.premium-arrivals-page p,
+.premium-detail-page p,
+.products-hero p,
+.arrivals-hero p,
+.arrival-section-head p,
+.premium-product-info p,
+.arrival-card-body p,
+.premium-detail-section p {
+  color: var(--luxury-muted) !important;
+}
+
+/* BUTTONS */
+.hero-actions a:first-child,
+.section-head a,
+.home-cta a:first-child,
+.premium-filter-card button,
+.premium-card-actions button,
+.detail-action-row button:first-child,
+.arrival-hero-actions a:first-child,
+.arrival-luxury-band,
+.category-strip button.active {
+  background: linear-gradient(135deg, #15110d, #2a2118) !important;
+  color: var(--luxury-light-gold) !important;
+  border-color: var(--luxury-border) !important;
+}
+
+/* SECONDARY BUTTONS */
+.hero-actions a:last-child,
+.home-cta a:last-child,
+.premium-card-actions a,
+.detail-action-row button:last-child,
+.arrival-hero-actions a:last-child {
+  background: rgba(255, 250, 243, 0.86) !important;
+  color: var(--luxury-black) !important;
+  border: 1px solid var(--luxury-border) !important;
+}
+
+/* CARDS */
+.category-card,
+.ritual-card,
+.story-visual,
+.home-cta,
+.premium-filter-card,
+.products-toolbar-premium,
+.premium-product-card,
+.arrival-premium-card,
+.arrival-category-card,
+.detail-gallery-card,
+.premium-detail-info,
+.detail-state {
+  background: rgba(255, 250, 243, 0.84) !important;
+  border: 1px solid var(--luxury-border) !important;
+  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.13) !important;
+  backdrop-filter: blur(22px);
+}
+
+/* PRODUCT IMAGE BACKGROUNDS */
+.premium-product-image,
+.arrival-img,
+.detail-main-stage {
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 30%),
+    linear-gradient(145deg, #fffaf3, #f2d6a3) !important;
+}
+
+/* BADGES */
+.product-floating-badges span,
+.detail-badge-row span,
+.arrival-badge,
+.product-card-meta span,
+.category-strip button:hover {
+  background: var(--luxury-black) !important;
+  color: var(--luxury-light-gold) !important;
+}
+
+/* PRICE */
+.premium-price-row strong,
+.detail-price-premium strong,
+.arrival-card-body strong {
+  color: var(--luxury-black) !important;
+}
+
+/* DARK STORY SECTIONS */
+.story-card,
+.arrival-luxury-band {
+  background:
+    radial-gradient(circle at top right, rgba(200, 155, 92, 0.22), transparent 34%),
+    linear-gradient(135deg, #080705, #15110d 60%, #2a2118) !important;
+  color: var(--luxury-ivory) !important;
+}
+
+.story-card h2,
+.arrival-luxury-band h2 {
+  color: var(--luxury-light-gold) !important;
+}
+
+.story-card p,
+.arrival-luxury-band p {
+  color: rgba(255, 250, 243, 0.76) !important;
+}
+
+/* LOGO IMAGE SAFETY */
+.premium-brand img,
+.hero-product-stage img,
+.footer-brand-block img,
+.auth-logo,
+.admin-brand img,
+.staff-brand img {
+  object-fit: contain !important;
+}
+
+/* HOVER 3D DEPTH */
+.premium-product-card:hover,
+.arrival-premium-card:hover,
+.category-card:hover,
+.ritual-card:hover,
+.arrival-category-card:hover {
+  transform: translateY(-12px) rotateX(3deg) rotateY(-2deg) !important;
+  box-shadow: 0 42px 120px rgba(21, 17, 13, 0.22) !important;
+}
+
+/* Global luxury page enhancement */
+main {
+  position: relative;
+  z-index: 1;
+}
+
+a,
+button {
+  transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+}
+
+a:hover,
+button:hover {
+  transform: translateY(-3px);
+}
+
+.home-page,
+.premium-arrivals-page,
+.shop-lux-page,
+.about-page,
+.contact-page {
+  animation: luxuryPageReveal 0.6s ease both;
+}
+
+@keyframes luxuryPageReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero-section,
+.arrivals-hero,
+.shop-lux-hero,
+.about-hero,
+.contact-hero {
+  position: relative;
+}
+
+.home-hero-section::before,
+.arrivals-hero::before,
+.shop-lux-hero::before,
+.about-hero::before,
+.contact-hero::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: 4%;
+  top: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, white, #f2d6a3 34%, #c89b5c 78%, #15110d);
+  opacity: 0.08;
+  pointer-events: none;
+  animation: luxuryHeroOrb 7s ease-in-out infinite;
+}
+
+@keyframes luxuryHeroOrb {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  50% {
+    transform: translateY(-24px) rotateX(18deg);
+  }
+}
+/* Premium page motion polish */
+.home-page,
+.about-page,
+.shop-lux-page,
+.premium-arrivals-page,
+.contact-page {
+  animation: luxuryPageReveal 0.7s ease both;
+}
+
+@keyframes luxuryPageReveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-category-card,
+.shop-product-card,
+.arrival-premium-card,
+.about-card,
+.contact-card,
+.home-ritual-grid article {
+  transform-style: preserve-3d;
+}
+
+.home-category-card:hover,
+.shop-product-card:hover,
+.arrival-premium-card:hover,
+.about-card:hover,
+.contact-card:hover,
+.home-ritual-grid article:hover {
+  transform: translateY(-12px) rotateX(4deg) rotateY(-2deg);
+}
+
+.home-hero-section,
+.about-hero,
+.shop-lux-hero,
+.arrivals-hero,
+.contact-hero {
+  position: relative;
+}
+
+.home-hero-section::after,
+.about-hero::after,
+.shop-lux-hero::after,
+.arrivals-hero::after,
+.contact-hero::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: 4%;
+  top: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, white, #f2d6a3 34%, #c89b5c 78%, #15110d);
+  opacity: 0.08;
+  pointer-events: none;
+  animation: luxuryPageOrb 7s ease-in-out infinite;
+}
+
+@keyframes luxuryPageOrb {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  50% {
+    transform: translateY(-26px) rotateX(18deg);
+  }
+}

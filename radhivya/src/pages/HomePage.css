@@ -1,0 +1,548 @@
+.home-page {
+  min-height: 100vh;
+  background: transparent;
+  color: #15110d;
+  overflow-x: hidden;
+}
+
+/* HERO */
+
+.home-hero-section {
+  padding: 76px 0 80px;
+}
+
+.home-hero-inner {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 0.95fr;
+  gap: 54px;
+  align-items: center;
+}
+
+.home-hero-content {
+  animation: homeFadeUp 0.8s ease both;
+}
+
+.home-eyebrow {
+  display: inline-block;
+  color: #9b6b3f;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+.home-hero-content h1 {
+  color: #15110d !important;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(58px, 9vw, 112px);
+  line-height: 0.88;
+  letter-spacing: -3px;
+  margin: 0 0 26px;
+}
+
+.home-hero-content p {
+  color: #7a6a58 !important;
+  font-size: 18px;
+  line-height: 1.85;
+  max-width: 650px;
+  margin: 0;
+}
+
+.home-hero-buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 34px;
+}
+
+.home-hero-buttons a {
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 24px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 900;
+  transition: 0.3s ease;
+}
+
+.home-hero-buttons a:first-child {
+  background: linear-gradient(135deg, #15110d, #2a2118);
+  color: #f2d6a3;
+  box-shadow: 0 22px 55px rgba(21, 17, 13, 0.24);
+}
+
+.home-hero-buttons a:last-child {
+  background: rgba(255, 250, 243, 0.86);
+  color: #15110d;
+  border: 1px solid rgba(200, 155, 92, 0.28);
+}
+
+.home-hero-buttons a:hover {
+  transform: translateY(-5px) rotateX(4deg);
+}
+
+/* HERO VISUAL */
+
+.home-hero-visual {
+  perspective: 1200px;
+  animation: homeFadeUp 0.9s ease 0.1s both;
+}
+
+.home-logo-stage {
+  position: relative;
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  border-radius: 44px;
+  background: rgba(255, 250, 243, 0.84);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  box-shadow: 0 34px 110px rgba(21, 17, 13, 0.15);
+  backdrop-filter: blur(24px);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  animation: homeStageTilt 7s ease-in-out infinite;
+}
+
+.home-main-orb {
+  position: absolute;
+  width: 390px;
+  height: 390px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, white, #f2d6a3 34%, #c89b5c 75%, #15110d);
+  box-shadow: 0 38px 110px rgba(21, 17, 13, 0.22);
+  animation: homeOrbFloat 5.5s ease-in-out infinite;
+}
+
+.home-logo-stage::before {
+  content: "";
+  position: absolute;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 155, 92, 0.28);
+  animation: homeRingSpin 18s linear infinite;
+}
+
+.home-logo-stage::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 850px;
+  background: linear-gradient(to bottom, transparent, rgba(242, 214, 163, 0.28), transparent);
+  transform: rotate(34deg);
+  filter: blur(10px);
+  animation: homeLightBeam 7s ease-in-out infinite;
+}
+
+.home-logo-stage img {
+  position: relative;
+  z-index: 3;
+  width: 58%;
+  max-width: 360px;
+  object-fit: contain;
+  filter: drop-shadow(0 34px 44px rgba(21, 17, 13, 0.26));
+  animation: homeLogoFloat 5s ease-in-out infinite;
+}
+
+.home-floating-card {
+  position: absolute;
+  z-index: 4;
+  background: rgba(255, 250, 243, 0.9);
+  border: 1px solid rgba(200, 155, 92, 0.28);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 26px 70px rgba(21, 17, 13, 0.15);
+  backdrop-filter: blur(18px);
+}
+
+.home-floating-card strong {
+  display: block;
+  color: #15110d;
+  margin-bottom: 6px;
+}
+
+.home-floating-card span {
+  color: #7a6a58;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.card-one {
+  top: 42px;
+  left: 38px;
+  animation: homeSmallFloat 4s ease-in-out infinite;
+}
+
+.card-two {
+  right: 38px;
+  bottom: 42px;
+  animation: homeSmallFloat 4.5s ease-in-out infinite reverse;
+}
+
+/* SECTIONS */
+
+.home-section,
+.home-story-section,
+.home-final-cta {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.home-section {
+  padding: 72px 0;
+}
+
+.home-section-head {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 34px;
+}
+
+.home-section-head span,
+.home-story-card span {
+  color: #9b6b3f;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.home-section-head h2,
+.home-story-card h2,
+.home-final-cta h2 {
+  color: #15110d !important;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.04;
+  margin: 12px 0 14px;
+}
+
+.home-section-head p,
+.home-final-cta p {
+  color: #7a6a58 !important;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* CATEGORY */
+
+.home-category-grid,
+.home-ritual-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.home-category-card,
+.home-ritual-grid article {
+  background: rgba(255, 250, 243, 0.84);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  border-radius: 30px;
+  padding: 28px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 28px 90px rgba(21, 17, 13, 0.12);
+  backdrop-filter: blur(22px);
+  transition: 0.32s ease;
+}
+
+.home-category-card:hover,
+.home-ritual-grid article:hover {
+  transform: translateY(-10px) rotateX(3deg) rotateY(-2deg);
+  box-shadow: 0 40px 120px rgba(21, 17, 13, 0.2);
+}
+
+.home-category-icon {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f2d6a3, #c89b5c);
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+
+.home-category-card h3,
+.home-ritual-grid h3 {
+  color: #15110d !important;
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  margin: 0 0 10px;
+}
+
+.home-category-card p,
+.home-ritual-grid p {
+  color: #7a6a58 !important;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* STORY */
+
+.home-story-section {
+  padding: 72px 0;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.home-story-card {
+  background:
+    radial-gradient(circle at top right, rgba(200, 155, 92, 0.2), transparent 34%),
+    linear-gradient(135deg, #080705, #15110d 60%, #2a2118);
+  border-radius: 38px;
+  padding: 46px;
+  box-shadow: 0 36px 110px rgba(21, 17, 13, 0.25);
+  color: #fffaf3;
+}
+
+.home-story-card h2 {
+  color: #f2d6a3 !important;
+}
+
+.home-story-card p {
+  color: rgba(255, 250, 243, 0.76) !important;
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+.home-story-card a {
+  display: inline-flex;
+  margin-top: 20px;
+  background: linear-gradient(145deg, #f2d6a3, #c89b5c);
+  color: #15110d;
+  padding: 14px 20px;
+  border-radius: 15px;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.home-story-visual {
+  min-height: 380px;
+  border-radius: 38px;
+  background: rgba(255, 250, 243, 0.84);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.13);
+  backdrop-filter: blur(22px);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.story-luxury-orb {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, white, #f2d6a3 34%, #c89b5c 75%, #15110d);
+  box-shadow: 0 36px 100px rgba(21, 17, 13, 0.22);
+  animation: homeOrbFloat 5s ease-in-out infinite;
+}
+
+.story-small-card {
+  position: absolute;
+  right: 34px;
+  bottom: 34px;
+  background: rgba(255, 250, 243, 0.9);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 22px 60px rgba(21, 17, 13, 0.14);
+}
+
+.story-small-card strong {
+  color: #15110d;
+}
+
+.story-small-card p {
+  color: #7a6a58 !important;
+  margin: 6px 0 0;
+}
+
+/* CTA */
+
+.home-final-cta {
+  margin-bottom: 80px;
+  text-align: center;
+  background: rgba(255, 250, 243, 0.84);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  border-radius: 38px;
+  padding: 50px;
+  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.13);
+  backdrop-filter: blur(22px);
+}
+
+.home-final-cta p {
+  max-width: 760px;
+  margin: 0 auto 26px;
+}
+
+.home-final-cta div {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.home-final-cta a {
+  padding: 15px 22px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.home-final-cta a:first-child {
+  background: linear-gradient(135deg, #15110d, #2a2118);
+  color: #f2d6a3;
+}
+
+.home-final-cta a:last-child {
+  background: rgba(255, 250, 243, 0.88);
+  color: #15110d;
+  border: 1px solid rgba(200, 155, 92, 0.28);
+}
+
+/* ANIMATIONS */
+
+@keyframes homeFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes homeStageTilt {
+  0%,
+  100% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+
+  50% {
+    transform: rotateX(3deg) rotateY(-5deg);
+  }
+}
+
+@keyframes homeOrbFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  50% {
+    transform: translateY(-22px) rotateX(14deg);
+  }
+}
+
+@keyframes homeLogoFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotateY(10deg);
+  }
+}
+
+@keyframes homeSmallFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes homeRingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes homeLightBeam {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: translateX(-80px) rotate(34deg);
+  }
+
+  50% {
+    opacity: 0.38;
+    transform: translateX(80px) rotate(34deg);
+  }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 980px) {
+  .home-hero-inner,
+  .home-story-section {
+    grid-template-columns: 1fr;
+  }
+
+  .home-category-grid,
+  .home-ritual-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-logo-stage {
+    min-height: 440px;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-hero-section {
+    padding-top: 48px;
+  }
+
+  .home-hero-inner,
+  .home-section,
+  .home-story-section,
+  .home-final-cta {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .home-category-grid,
+  .home-ritual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-logo-stage {
+    min-height: 360px;
+    border-radius: 30px;
+  }
+
+  .home-main-orb {
+    width: 230px;
+    height: 230px;
+  }
+
+  .home-floating-card {
+    position: relative;
+    inset: auto;
+    margin: 8px;
+  }
+
+  .home-story-card,
+  .home-final-cta {
+    padding: 30px;
+  }
+}

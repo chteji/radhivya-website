@@ -1,0 +1,226 @@
+.premium-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 250, 243, 0.78);
+  backdrop-filter: blur(22px);
+  border-bottom: 1px solid rgba(200, 155, 92, 0.22);
+  box-shadow: 0 16px 40px rgba(21, 17, 13, 0.06);
+}
+
+.premium-announcement {
+  background:
+    linear-gradient(90deg, #15110d, #2a2118, #c89b5c, #2a2118, #15110d);
+  background-size: 300% 100%;
+  color: #fffaf3;
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  animation: goldBarMove 8s ease-in-out infinite;
+}
+
+.premium-nav {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  min-height: 96px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 30px;
+}
+
+.premium-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.premium-brand img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 250, 243, 0.75), rgba(242, 214, 163, 0.26));
+  border: 1px solid rgba(200, 155, 92, 0.24);
+  box-shadow: 0 14px 38px rgba(21, 17, 13, 0.1);
+  animation: logoFloatPremium 4.8s ease-in-out infinite;
+}
+
+.premium-brand strong {
+  display: block;
+  color: #15110d;
+  font-family: "Playfair Display", serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.premium-brand span {
+  display: block;
+  color: #7a6a58;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2.4px;
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+.premium-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+}
+
+.premium-links a,
+.shop-dropdown > a {
+  color: #15110d;
+  text-decoration: none;
+  font-weight: 900;
+  position: relative;
+  padding: 12px 0;
+}
+
+.premium-links a::after,
+.shop-dropdown > a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 7px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #15110d, #c89b5c);
+  transition: 0.25s ease;
+}
+
+.premium-links a:hover::after,
+.shop-dropdown:hover > a::after,
+.premium-links a.active::after {
+  width: 100%;
+}
+
+.shop-dropdown {
+  position: relative;
+}
+
+.shop-menu {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  width: 278px;
+  transform: translateX(-50%) translateY(14px) rotateX(8deg);
+  transform-origin: top;
+  background: rgba(255, 250, 243, 0.94);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 30px 90px rgba(21, 17, 13, 0.14);
+  padding: 14px;
+  display: grid;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.28s ease;
+  backdrop-filter: blur(22px);
+}
+
+.shop-dropdown:hover .shop-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) rotateX(0deg);
+}
+
+.shop-menu a {
+  padding: 11px 12px;
+  border-radius: 13px;
+  color: #15110d;
+}
+
+.shop-menu a:hover {
+  background: rgba(242, 214, 163, 0.28);
+}
+
+.premium-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.premium-actions a {
+  text-decoration: none;
+  color: #15110d;
+  border: 1px solid rgba(200, 155, 92, 0.24);
+  background: rgba(255, 250, 243, 0.7);
+  padding: 12px 16px;
+  border-radius: 999px;
+  font-weight: 900;
+  transition: 0.28s ease;
+}
+
+.premium-actions a:hover {
+  transform: translateY(-3px) rotateX(4deg);
+  box-shadow: 0 18px 44px rgba(21, 17, 13, 0.12);
+  border-color: rgba(200, 155, 92, 0.44);
+}
+
+.premium-actions .profile-pill {
+  background: linear-gradient(135deg, #15110d, #2a2118);
+  color: #f2d6a3;
+  border-color: rgba(200, 155, 92, 0.35);
+}
+
+@keyframes goldBarMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes logoFloatPremium {
+  0%,
+  100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotateY(-8deg);
+  }
+}
+
+@media (max-width: 1050px) {
+  .premium-nav {
+    grid-template-columns: 1fr;
+    padding: 18px 0;
+  }
+
+  .premium-links,
+  .premium-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .premium-brand strong {
+    font-size: 28px;
+  }
+
+  .premium-brand img {
+    width: 62px;
+    height: 62px;
+  }
+
+  .premium-links {
+    gap: 14px;
+  }
+
+  .premium-actions a {
+    padding: 10px 13px;
+  }
+}
