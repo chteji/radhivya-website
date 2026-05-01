@@ -1,23 +1,25 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
+import Toast from "../components/Toast.jsx";
 import "./ContactPage.css";
 
 const API_URL = "http://localhost:5000";
 
 export default function ContactPage() {
-  const [loading, setLoading] = useState(false);
-  const [messageBox, setMessageBox] = useState("");
-  const [messageType, setMessageType] = useState("");
-
+  const [toast, setToast] = useState("");
   const [form, setForm] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    subject: "Product question",
+    customer_name: localStorage.getItem("userName") || "",
+    customer_email: localStorage.getItem("customerEmail") || "",
+    customer_phone: localStorage.getItem("customerPhone") || "",
+    subject: "",
     message: "",
   });
+
+  function showToast(message) {
+    setToast(message);
+    setTimeout(() => setToast(""), 2600);
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -28,33 +30,16 @@ export default function ContactPage() {
     }));
   }
 
-  function validateForm() {
-    if (!form.full_name.trim()) return "Full name is required.";
-    if (!form.email.trim()) return "Email is required.";
-    if (!form.subject.trim()) return "Subject is required.";
-    if (!form.message.trim()) return "Message is required.";
-
-    return "";
-  }
-
-  async function handleSubmit(e) {
+  async function submitMessage(e) {
     e.preventDefault();
 
-    setMessageBox("");
-    setMessageType("");
-
-    const validationError = validateForm();
-
-    if (validationError) {
-      setMessageBox(validationError);
-      setMessageType("error");
+    if (!form.customer_email || !form.subject || !form.message) {
+      showToast("Email, subject and message are required.");
       return;
     }
 
     try {
-      setLoading(true);
-
-      const response = await fetch(`${API_URL}/api/support`, {
+      const response = await fetch(`${API_URL}/api/support/tickets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,156 +50,120 @@ export default function ContactPage() {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || data.message || "Failed to send message.");
+        throw new Error(data.message || "Failed to send message.");
       }
 
-      setMessageBox(
-        "Your message has been sent successfully. Our support team will review it."
-      );
-      setMessageType("success");
+      showToast("Message sent. Staff reply will appear in your Profile Inbox.");
 
-      setForm({
-        full_name: "",
-        email: "",
-        phone: "",
-        subject: "Product question",
+      setForm((prev) => ({
+        ...prev,
+        subject: "",
         message: "",
-      });
+      }));
     } catch (error) {
-      setMessageBox(error.message);
-      setMessageType("error");
-    } finally {
-      setLoading(false);
+      showToast(error.message);
     }
   }
 
   return (
     <>
       <Header />
+      <Toast message={toast} />
 
       <main className="contact-page">
-        <div className="contact-container">
-          <section className="contact-header">
-            <h1>Contact Us</h1>
+        <section className="contact-hero">
+          <span>Contact Radhivya</span>
+          <h1>We are here for your skincare questions.</h1>
+          <p>
+            Send your query to Radhivya staff. Replies will appear inside your
+            profile inbox, so your support conversation stays organized.
+          </p>
+        </section>
 
+        <section className="contact-layout">
+          <div className="contact-card contact-info-card">
+            <span>Support Experience</span>
+            <h2>Premium customer care</h2>
             <p>
-              Have a question about your order, product, shipping, or skincare
-              routine? Send us a message and our support team will help you.
+              Ask about orders, products, payments, skincare suggestions, or
+              delivery tracking. Staff can reply directly to your inbox.
             </p>
-          </section>
 
-          <section className="contact-layout">
-            <div className="contact-card">
-              <h2>Send Us a Message</h2>
+            <div className="contact-info-grid">
+              <div>
+                <strong>Email</strong>
+                <span>support@radhivya.com</span>
+              </div>
 
-              {messageBox && (
-                <div
-                  className={`contact-message ${
-                    messageType === "success" ? "contact-success" : "contact-error"
-                  }`}
-                >
-                  {messageBox}
-                </div>
-              )}
+              <div>
+                <strong>Response</strong>
+                <span>Staff inbox reply</span>
+              </div>
 
-              <form className="contact-form" onSubmit={handleSubmit}>
-                <div className="contact-row">
-                  <div className="contact-field">
-                    <label>Full Name *</label>
-                    <input
-                      name="full_name"
-                      value={form.full_name}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-
-                  <div className="contact-field">
-                    <label>Email *</label>
-                    <input
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </div>
-
-                <div className="contact-field">
-                  <label>Phone</label>
-                  <input
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-
-                <div className="contact-field">
-                  <label>Subject *</label>
-                  <select
-                    name="subject"
-                    value={form.subject}
-                    onChange={handleChange}
-                  >
-                    <option value="Product question">Product question</option>
-                    <option value="Order support">Order support</option>
-                    <option value="Shipping question">Shipping question</option>
-                    <option value="Return or refund">Return or refund</option>
-                    <option value="Website issue">Website issue</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className="contact-field">
-                  <label>Your Message *</label>
-                  <textarea
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    placeholder="Type your message here..."
-                  />
-                </div>
-
-                <button className="contact-btn" type="submit" disabled={loading}>
-                  {loading ? "Sending..." : "Send Message"}
-                </button>
-              </form>
+              <div>
+                <strong>Tracking</strong>
+                <span>7-day delivery flow</span>
+              </div>
             </div>
+          </div>
 
-            <aside className="contact-info-card">
-              <h2>Contact Details</h2>
+          <form className="contact-card contact-form" onSubmit={submitMessage}>
+            <h2>Send message</h2>
 
-              <div className="info-list">
-                <div className="info-box">
-                  <h3>Customer Support</h3>
-                  <p>Monday – Saturday, 9AM – 6PM</p>
-                </div>
+            <label>
+              Name
+              <input
+                name="customer_name"
+                value={form.customer_name}
+                onChange={handleChange}
+                placeholder="Your name"
+              />
+            </label>
 
-                <div className="info-box">
-                  <h3>Email</h3>
-                  <p>support@radhivya.com</p>
-                </div>
+            <label>
+              Email
+              <input
+                name="customer_email"
+                type="email"
+                value={form.customer_email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+              />
+            </label>
 
-                <div className="info-box">
-                  <h3>WhatsApp / Help</h3>
-                  <p>Quick support for order and product questions.</p>
-                </div>
+            <label>
+              Phone
+              <input
+                name="customer_phone"
+                value={form.customer_phone}
+                onChange={handleChange}
+                placeholder="Phone number"
+              />
+            </label>
 
-                <div className="info-box">
-                  <h3>Address</h3>
-                  <p>Radhivya Skincare Pvt. Ltd., India</p>
-                </div>
-              </div>
+            <label>
+              Subject
+              <input
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
+                placeholder="How can we help?"
+              />
+            </label>
 
-              <div className="contact-links">
-                <Link to="/products">Shop Products</Link>
-                <Link to="/login">Customer Login</Link>
-              </div>
-            </aside>
-          </section>
-        </div>
+            <label>
+              Message
+              <textarea
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                placeholder="Write your message..."
+              />
+            </label>
+
+            <button type="submit">Send to Staff</button>
+          </form>
+        </section>
       </main>
 
       <Footer />

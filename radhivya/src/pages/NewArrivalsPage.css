@@ -1,22 +1,20 @@
 .premium-arrivals-page {
-  min-height: 100vh;
   background: transparent;
   color: #15110d;
+  padding-bottom: 90px;
 }
 
 .arrivals-hero {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 78px 0 70px;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 44px;
-  align-items: center;
+  text-align: center;
+  padding: 70px 0 42px;
 }
 
 .arrivals-hero span,
-.arrival-section-head span {
-  color: #9b6b3f !important;
+.arrival-feature span,
+.arrival-content span {
+  color: #9b6b3f;
   text-transform: uppercase;
   letter-spacing: 5px;
   font-size: 12px;
@@ -24,376 +22,187 @@
 }
 
 .arrivals-hero h1,
-.arrival-section-head h2,
-.arrival-luxury-band h2 {
-  color: #15110d !important;
+.arrival-feature h2 {
+  color: #15110d;
   font-family: "Playfair Display", serif;
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 0.96;
-  margin: 14px 0 20px;
+  font-size: clamp(52px, 8vw, 92px);
+  line-height: 0.95;
+  margin: 16px 0 18px;
 }
 
-.arrivals-hero p {
-  color: #7a6a58 !important;
-  line-height: 1.85;
-  font-size: 18px;
-  max-width: 640px;
-}
-
-.arrival-hero-actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 30px;
-}
-
-.arrival-hero-actions a {
-  text-decoration: none;
-  border-radius: 16px;
-  padding: 15px 22px;
-  font-weight: 900;
-  transition: 0.3s ease;
-}
-
-.arrival-hero-actions a:first-child {
-  background: linear-gradient(135deg, #15110d, #2a2118) !important;
-  color: #f2d6a3 !important;
-}
-
-.arrival-hero-actions a:last-child {
-  background: rgba(255, 250, 243, 0.86) !important;
-  color: #15110d !important;
-  border: 1px solid rgba(200, 155, 92, 0.28) !important;
-}
-
-.arrival-hero-stage {
-  position: relative;
-  min-height: 530px;
-  background: rgba(255, 250, 243, 0.84) !important;
-  border: 1px solid rgba(200, 155, 92, 0.25) !important;
-  border-radius: 42px;
-  box-shadow: 0 34px 110px rgba(21, 17, 13, 0.15) !important;
-  backdrop-filter: blur(22px);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.arrival-main-orb {
-  position: absolute;
-  width: 370px;
-  height: 370px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, white, #f2d6a3 34%, #c89b5c 75%, #15110d) !important;
-  box-shadow: 0 38px 110px rgba(21, 17, 13, 0.22);
-  animation: arrivalOrb 5s ease-in-out infinite;
-}
-
-.arrival-hero-stage img {
-  position: relative;
-  z-index: 2;
-  width: 62%;
-  object-fit: contain;
-  filter: drop-shadow(0 32px 42px rgba(21, 17, 13, 0.24));
-  animation: arrivalFloat 5.5s ease-in-out infinite;
-}
-
-.arrival-note {
-  position: absolute;
-  z-index: 3;
-  background: rgba(255, 250, 243, 0.9) !important;
-  border: 1px solid rgba(200, 155, 92, 0.28) !important;
-  border-radius: 999px;
-  padding: 14px 18px;
-  color: #15110d !important;
-  font-weight: 900;
-  box-shadow: 0 18px 48px rgba(21, 17, 13, 0.12);
-}
-
-.arrival-note.top {
-  top: 46px;
-  left: 42px;
-}
-
-.arrival-note.bottom {
-  bottom: 46px;
-  right: 42px;
-}
-
-.arrival-products-section,
-.arrival-rituals,
-.arrival-luxury-band {
-  width: min(1180px, calc(100% - 32px));
-  margin: 0 auto;
-}
-
-.arrival-products-section,
-.arrival-rituals {
-  padding: 70px 0;
-}
-
-.arrival-section-head {
-  text-align: center;
-  max-width: 780px;
-  margin: 0 auto 30px;
-}
-
-.arrival-section-head h2,
-.arrival-luxury-band h2 {
-  font-size: clamp(38px, 5vw, 62px);
-}
-
-.arrival-section-head p {
-  color: #7a6a58 !important;
+.arrivals-hero p,
+.arrival-feature p,
+.arrival-content p {
+  color: #7a6a58;
+  font-size: 17px;
   line-height: 1.8;
 }
 
-.arrival-premium-grid {
+.arrivals-hero p {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.arrival-feature,
+.arrival-grid {
+  width: min(1220px, calc(100% - 32px));
+  margin: 0 auto 44px;
+}
+
+.arrival-feature {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 420px;
+  gap: 26px;
+  align-items: center;
+  background: rgba(255, 250, 243, 0.86);
+  border: 1px solid rgba(200, 155, 92, 0.24);
+  border-radius: 36px;
+  padding: 42px;
+  box-shadow: 0 32px 100px rgba(21, 17, 13, 0.13);
+  backdrop-filter: blur(22px);
+}
+
+.arrival-feature h2 {
+  font-size: clamp(38px, 6vw, 64px);
+}
+
+.arrival-feature a,
+.arrival-content a {
+  background: linear-gradient(135deg, #15110d, #2a2118);
+  color: #f2d6a3;
+  padding: 13px 18px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 900;
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 14px;
+}
+
+.arrival-feature-visual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.arrival-feature-visual div {
+  height: 160px;
+  border-radius: 32px;
+  background: rgba(255, 250, 243, 0.72);
+  border: 1px solid rgba(200, 155, 92, 0.25);
+  display: grid;
+  place-items: center;
+  font-size: 58px;
+  box-shadow: 0 22px 70px rgba(21, 17, 13, 0.1);
+  animation: arrivalFloat 5s ease-in-out infinite;
+}
+
+.arrival-feature-visual div:first-child {
+  grid-row: span 2;
+  height: 338px;
+}
+
+.arrival-feature-visual div:nth-child(2) {
+  animation-delay: -1s;
+}
+
+.arrival-feature-visual div:nth-child(3) {
+  animation-delay: -2s;
+}
+
+.arrival-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 22px;
 }
 
 .arrival-premium-card {
-  position: relative;
-  background: rgba(255, 250, 243, 0.84) !important;
-  border: 1px solid rgba(200, 155, 92, 0.25) !important;
-  border-radius: 30px;
-  padding: 16px;
-  text-decoration: none;
-  color: inherit;
-  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.12) !important;
-  transition: 0.32s ease;
   overflow: hidden;
+  background: rgba(255, 250, 243, 0.86);
+  border: 1px solid rgba(200, 155, 92, 0.24);
+  border-radius: 34px;
+  box-shadow: 0 32px 100px rgba(21, 17, 13, 0.13);
   backdrop-filter: blur(22px);
-}
-
-.arrival-premium-card:hover {
-  transform: translateY(-12px) rotateX(3deg) rotateY(-2deg);
-  box-shadow: 0 42px 120px rgba(21, 17, 13, 0.22) !important;
-}
-
-.arrival-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 3;
-  background: #15110d !important;
-  color: #f2d6a3 !important;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.arrival-img {
-  height: 230px;
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 30%),
-    linear-gradient(145deg, #fffaf3, #f2d6a3) !important;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.arrival-img img {
-  width: 78%;
-  height: 78%;
-  object-fit: contain;
-  filter: drop-shadow(0 22px 30px rgba(21, 17, 13, 0.18));
-  transition: 0.35s ease;
-}
-
-.arrival-premium-card:hover .arrival-img img {
-  transform: scale(1.08) translateY(-6px);
-}
-
-.arrival-card-body {
-  padding: 18px 4px 4px;
-}
-
-.arrival-card-body small {
-  color: #9b6b3f !important;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-weight: 900;
-}
-
-.arrival-card-body h3 {
-  color: #15110d !important;
-  font-family: "Playfair Display", serif;
-  font-size: 24px;
-  line-height: 1.15;
-  min-height: 56px;
-  margin: 10px 0;
-}
-
-.arrival-card-body p {
-  color: #7a6a58 !important;
-  line-height: 1.6;
-  font-size: 14px;
-  min-height: 46px;
-  margin: 0 0 14px;
-}
-
-.arrival-card-body div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.arrival-card-body strong {
-  color: #15110d !important;
-  font-size: 24px;
-}
-
-.arrival-card-body del {
-  color: #9b6b3f;
-}
-
-.arrival-category-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-}
-
-.arrival-category-card {
-  background: rgba(255, 250, 243, 0.84) !important;
-  border: 1px solid rgba(200, 155, 92, 0.25) !important;
-  border-radius: 28px;
-  padding: 26px;
-  text-decoration: none;
-  color: inherit;
-  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.12) !important;
   transition: 0.32s ease;
 }
 
-.arrival-category-card:hover {
-  transform: translateY(-10px) rotateX(3deg);
-  box-shadow: 0 42px 120px rgba(21, 17, 13, 0.22) !important;
+.arrival-image {
+  display: block;
+  height: 320px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #fffaf3, #f2d6a3);
 }
 
-.arrival-category-card div {
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #f2d6a3, #c89b5c) !important;
-  display: grid;
-  place-items: center;
-  font-size: 28px;
-  margin-bottom: 16px;
+.arrival-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.45s ease;
 }
 
-.arrival-category-card h3 {
-  color: #15110d !important;
+.arrival-premium-card:hover .arrival-image img {
+  transform: scale(1.08);
+}
+
+.arrival-content {
+  padding: 24px;
+}
+
+.arrival-content h3 {
+  color: #15110d;
   font-family: "Playfair Display", serif;
-  font-size: 25px;
-  margin: 0 0 10px;
+  font-size: 31px;
+  margin: 10px 0 8px;
 }
 
-.arrival-category-card p {
-  color: #7a6a58 !important;
-  line-height: 1.7;
-  margin: 0;
+.arrival-content div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  margin-top: 18px;
 }
 
-.arrival-luxury-band {
-  margin-bottom: 80px;
-  background:
-    radial-gradient(circle at top right, rgba(200, 155, 92, 0.22), transparent 34%),
-    linear-gradient(135deg, #080705, #15110d 60%, #2a2118) !important;
-  color: #fffaf3 !important;
-  border-radius: 38px;
-  padding: 48px;
-  text-align: center;
-  box-shadow: 0 36px 110px rgba(21, 17, 13, 0.25) !important;
+.arrival-content strong {
+  color: #15110d;
+  font-size: 24px;
 }
 
-.arrival-luxury-band h2 {
-  color: #f2d6a3 !important;
-}
-
-.arrival-luxury-band p {
-  color: rgba(255, 250, 243, 0.76) !important;
-  line-height: 1.8;
-  max-width: 760px;
-  margin: 0 auto 26px;
-}
-
-.arrival-luxury-band a {
-  background: linear-gradient(145deg, #f2d6a3, #c89b5c) !important;
-  color: #15110d !important;
-  padding: 15px 22px;
-  border-radius: 15px;
-  font-weight: 900;
-  text-decoration: none;
-}
-
-.arrival-state {
-  background: rgba(255, 250, 243, 0.84) !important;
-  border: 1px solid rgba(200, 155, 92, 0.25) !important;
-  border-radius: 28px;
-  padding: 34px;
-  text-align: center;
-  color: #15110d !important;
-  box-shadow: 0 30px 95px rgba(21, 17, 13, 0.12) !important;
-}
-
-@keyframes arrivalOrb {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-
-  50% {
-    transform: translateY(-18px) scale(1.05);
-  }
+.arrival-content a {
+  margin-top: 0;
 }
 
 @keyframes arrivalFloat {
   0%, 100% {
-    transform: translateY(0) rotateY(0);
+    transform: translateY(0) rotateZ(-2deg);
   }
 
   50% {
-    transform: translateY(-18px) rotateY(10deg);
+    transform: translateY(-16px) rotateZ(5deg);
   }
 }
 
-@media (max-width: 1080px) {
-  .arrivals-hero {
+@media (max-width: 980px) {
+  .arrival-feature {
     grid-template-columns: 1fr;
   }
 
-  .arrival-premium-grid,
-  .arrival-category-grid {
+  .arrival-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 620px) {
-  .arrivals-hero,
-  .arrival-products-section,
-  .arrival-rituals,
-  .arrival-luxury-band {
-    width: min(100% - 24px, 1180px);
-  }
-
-  .arrival-hero-stage {
-    min-height: 360px;
-  }
-
-  .arrival-main-orb {
-    width: 230px;
-    height: 230px;
-  }
-
-  .arrival-premium-grid,
-  .arrival-category-grid {
+  .arrival-grid,
+  .arrival-feature-visual {
     grid-template-columns: 1fr;
   }
 
-  .arrival-luxury-band {
-    padding: 30px;
+  .arrival-feature-visual div:first-child {
+    height: 160px;
+  }
+
+  .arrival-content div {
+    display: grid;
   }
 }

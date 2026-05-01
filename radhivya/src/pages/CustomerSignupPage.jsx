@@ -4,46 +4,39 @@ import "./CustomerSignupPage.css";
 
 const API_URL = "http://localhost:5000";
 
+const initialForm = {
+  full_name: "",
+  age: "",
+  dob: "",
+  phone: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+};
+
 export default function CustomerSignupPage() {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState("details");
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState(initialForm);
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [otpRequestId, setOtpRequestId] = useState("");
-  const [testingOtp, setTestingOtp] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [secondsLeft, setSecondsLeft] = useState(120);
-
-  const [form, setForm] = useState({
-    full_name: "",
-    age: "",
-    dob: "",
-    mobile: "",
-    email: "",
-    password: "",
-    confirm_password: "",
-  });
 
   useEffect(() => {
-    if (step !== "otp") return;
+    if (timer <= 0) return;
 
-    setSecondsLeft(120);
-
-    const timer = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-
-        return prev - 1;
-      });
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [step, otpRequestId]);
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  function showMessage(type, text) {
+    setMessage({ type, text });
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -54,35 +47,104 @@ export default function CustomerSignupPage() {
     }));
   }
 
-  function validateDetails() {
+  function validateForm() {
     if (!form.full_name.trim()) return "Full name is required.";
-    if (!form.age || Number(form.age) < 1) return "Valid age is required.";
-    if (!form.dob) return "Date of birth is required.";
-    if (!form.mobile.trim()) return "Mobile number is required.";
+    if (!form.age.trim()) return "Age is required.";
+    if (!form.dob.trim()) return "Date of birth is required.";
+    if (!form.phone.trim()) return "Mobile number is required.";
     if (!form.email.trim()) return "Email is required.";
     if (!form.password.trim()) return "Password is required.";
     if (form.password.length < 6) return "Password must be at least 6 characters.";
     if (form.password !== form.confirm_password) return "Passwords do not match.";
-
     return "";
   }
 
   async function sendOtp(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
-    const validationError = validateDetails();
+    const validationError = validateForm();
 
     if (validationError) {
-      setError(validationError);
+      showMessage("error", validationError);
       return;
     }
 
     try {
       setLoading(true);
+      showMessage("", "");
 
-      const response = await fetch(`${API_URL}/api/auth/customer-signup/send-otp`, {
+      const response = await fetch(`${API_URL}/api/email-otp/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: form.full_name,
+          email: form.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || data.error || "Failed to send OTP.");
+      }
+
+      setStep(2);
+      setTimer(120);
+      setOtp("");
+
+      showMessage(
+        "success",
+        "OTP sent successfully to your email. Please check inbox or spam folder."
+      );
+    } catch (error) {
+      showMessage("error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function verifyOtpAndCreateAccount(e) {
+    e.preventDefault();
+
+    if (!otp.trim()) {
+      showMessage("error", "Please enter OTP.");
+      return;
+    }
+
+    if (otp.trim().length !== 6) {
+      showMessage("error", "OTP must be 6 digits.");
+      return;
+    }
+
+    if (timer <= 0) {
+      showMessage("error", "OTP expired. Please generate a new OTP.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      showMessage("", "");
+
+      const verifyResponse = await fetch(`${API_URL}/api/email-otp/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          otp: otp.trim(),
+        }),
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyData.success) {
+        throw new Error(verifyData.message || verifyData.error || "Wrong OTP.");
+      }
+
+      const signupResponse = await fetch(`${API_URL}/api/customer-auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,96 +153,81 @@ export default function CustomerSignupPage() {
           full_name: form.full_name,
           age: form.age,
           dob: form.dob,
-          mobile: form.mobile,
+          phone: form.phone,
           email: form.email,
           password: form.password,
         }),
       });
 
-      const data = await response.json();
+      const signupData = await signupResponse.json();
 
-      if (!data.success) {
-        throw new Error(data.message || "Failed to send OTP.");
+      if (!signupData.success) {
+        throw new Error(signupData.message || signupData.error || "Signup failed.");
       }
 
-      setOtpRequestId(data.otp_request_id);
-      setTestingOtp(data.dev_otp_for_testing || "");
-      setStep("otp");
-      setSuccess("OTP generated successfully. It is valid for 2 minutes.");
-    } catch (err) {
-      setError(err.message);
+      const customer = signupData.customer;
+
+      localStorage.setItem("userRole", "customer");
+      localStorage.setItem("customerId", customer.id || "");
+      localStorage.setItem("userName", customer.full_name || form.full_name);
+      localStorage.setItem("customerEmail", customer.email || form.email);
+      localStorage.setItem("customerPhone", customer.phone || form.phone);
+      localStorage.setItem("radhivyaCustomerProfile", JSON.stringify(customer));
+
+      showMessage("success", "Account verified and created successfully.");
+
+      setTimeout(() => {
+        navigate("/profile");
+      }, 900);
+    } catch (error) {
+      showMessage("error", error.message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function verifyOtp(e) {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!otpCode.trim()) {
-      setError("Please enter OTP code.");
-      return;
-    }
-
-    if (secondsLeft <= 0) {
-      setError("OTP expired. Please generate a new OTP.");
+  async function resendOtp() {
+    if (timer > 0) {
+      showMessage("error", "Please wait until current OTP expires.");
       return;
     }
 
     try {
       setLoading(true);
+      setOtp("");
+      showMessage("", "");
 
-      const response = await fetch(`${API_URL}/api/auth/customer-signup/verify-otp`, {
+      const response = await fetch(`${API_URL}/api/email-otp/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          otp_request_id: otpRequestId,
-          otp_code: otpCode,
+          full_name: form.full_name,
+          email: form.email,
         }),
       });
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.message || "OTP verification failed.");
+        throw new Error(data.message || data.error || "Failed to resend OTP.");
       }
 
-      localStorage.setItem("userRole", "customer");
-      localStorage.setItem("customerId", data.customer.id);
-      localStorage.setItem("userName", data.customer.full_name);
-      localStorage.setItem("customerEmail", data.customer.email);
-      localStorage.setItem("customerPhone", data.customer.phone || "");
-
-      setSuccess("Account created successfully.");
-
-      setTimeout(() => {
-        navigate("/profile");
-      }, 900);
-    } catch (err) {
-      setError(err.message);
+      setTimer(120);
+      showMessage("success", "New OTP sent to your email.");
+    } catch (error) {
+      showMessage("error", error.message);
     } finally {
       setLoading(false);
     }
   }
 
-  function regenerateOtp() {
-    setStep("details");
-    setOtpCode("");
-    setOtpRequestId("");
-    setTestingOtp("");
-    setError("");
-    setSuccess("Fill details again and generate a new OTP.");
-  }
-
-  const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
-  const seconds = String(secondsLeft % 60).padStart(2, "0");
+  const minutes = String(Math.floor(timer / 60)).padStart(2, "0");
+  const seconds = String(timer % 60).padStart(2, "0");
 
   return (
-    <main className="signup-page">
+    <main className="customer-signup-page">
       <section className="signup-shell">
         <div className="signup-brand-panel">
           <img
@@ -196,165 +243,175 @@ export default function CustomerSignupPage() {
           <h1>Create your glow account</h1>
 
           <p>
-            Register with your name, age, date of birth, mobile number, and email.
-            Verify using a 6-digit OTP valid for only 2 minutes.
+            Register with your own email and password. Your email will be
+            verified with a 6-digit OTP before account creation.
           </p>
 
-          <div className="signup-points">
-            <strong>✓ OTP verification</strong>
-            <strong>✓ Customer record saved</strong>
-            <strong>✓ Visible to admin and staff</strong>
-            <strong>✓ Secure customer login after signup</strong>
-          </div>
+          <ul>
+            <li>✓ Customer email and password login</li>
+            <li>✓ Email OTP verification</li>
+            <li>✓ Customer record saved in database</li>
+            <li>✓ Only your own orders visible</li>
+            <li>✓ Forgot password support</li>
+          </ul>
         </div>
 
         <div className="signup-form-panel">
-          {step === "details" && (
-            <>
-              <div className="signup-badge">Step 1</div>
+          {step === 1 && (
+            <form className="signup-form" onSubmit={sendOtp}>
+              <span className="signup-step">Step 1</span>
 
-              <h2>Customer Details</h2>
+              <h2>Create Account</h2>
 
-              <p className="signup-subtitle">
-                Enter your details to generate your verification OTP.
-              </p>
+              <p>Enter your details. Then we will send OTP to your email.</p>
 
-              {error && <div className="signup-error">{error}</div>}
-              {success && <div className="signup-success">{success}</div>}
-
-              <form className="signup-form" onSubmit={sendOtp}>
+              <div className="signup-grid">
                 <label>
                   Full Name *
                   <input
                     name="full_name"
                     value={form.full_name}
                     onChange={handleChange}
-                    placeholder="Enter your name"
+                    placeholder="Enter full name"
                   />
                 </label>
 
-                <div className="signup-grid">
-                  <label>
-                    Age *
-                    <input
-                      name="age"
-                      type="number"
-                      value={form.age}
-                      onChange={handleChange}
-                      placeholder="Age"
-                    />
-                  </label>
+                <label>
+                  Age *
+                  <input
+                    name="age"
+                    type="number"
+                    value={form.age}
+                    onChange={handleChange}
+                    placeholder="Enter age"
+                  />
+                </label>
 
-                  <label>
-                    Date of Birth *
-                    <input
-                      name="dob"
-                      type="date"
-                      value={form.dob}
-                      onChange={handleChange}
-                    />
-                  </label>
-                </div>
+                <label>
+                  Date of Birth *
+                  <input
+                    name="dob"
+                    type="date"
+                    value={form.dob}
+                    onChange={handleChange}
+                  />
+                </label>
 
                 <label>
                   Mobile Number *
                   <input
-                    name="mobile"
-                    value={form.mobile}
+                    name="phone"
+                    value={form.phone}
                     onChange={handleChange}
-                    placeholder="9876543210"
+                    placeholder="Enter mobile number"
                   />
                 </label>
 
                 <label>
-                  Email ID *
+                  Email *
                   <input
                     name="email"
                     type="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="customer@example.com"
+                    placeholder="Enter your email"
                   />
                 </label>
 
-                <div className="signup-grid">
-                  <label>
-                    Password *
-                    <input
-                      name="password"
-                      type="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      placeholder="Minimum 6 characters"
-                    />
-                  </label>
+                <label>
+                  Password *
+                  <input
+                    name="password"
+                    type="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="Create password"
+                  />
+                </label>
 
-                  <label>
-                    Confirm Password *
-                    <input
-                      name="confirm_password"
-                      type="password"
-                      value={form.confirm_password}
-                      onChange={handleChange}
-                      placeholder="Repeat password"
-                    />
-                  </label>
-                </div>
-
-                <button type="submit" disabled={loading}>
-                  {loading ? "Generating OTP..." : "Generate OTP"}
-                </button>
-              </form>
-
-              <div className="signup-bottom">
-                Already have an account? <Link to="/login">Login here</Link>
-              </div>
-            </>
-          )}
-
-          {step === "otp" && (
-            <>
-              <div className="signup-badge">Step 2</div>
-
-              <h2>Verify OTP</h2>
-
-              <p className="signup-subtitle">
-                Enter the 6-digit OTP sent to your email and mobile number.
-              </p>
-
-              <div className={`otp-timer ${secondsLeft <= 20 ? "danger" : ""}`}>
-                OTP expires in <strong>{minutes}:{seconds}</strong>
+                <label className="signup-wide">
+                  Confirm Password *
+                  <input
+                    name="confirm_password"
+                    type="password"
+                    value={form.confirm_password}
+                    onChange={handleChange}
+                    placeholder="Confirm password"
+                  />
+                </label>
               </div>
 
-              {testingOtp && (
-                <div className="signup-dev-otp">
-                  Testing OTP: <strong>{testingOtp}</strong>
+              {message.text && (
+                <div className={`signup-message ${message.type}`}>
+                  {message.text}
                 </div>
               )}
 
-              {error && <div className="signup-error">{error}</div>}
-              {success && <div className="signup-success">{success}</div>}
+              <button type="submit" disabled={loading}>
+                {loading ? "Sending OTP..." : "Send OTP to Email"}
+              </button>
 
-              <form className="signup-form" onSubmit={verifyOtp}>
-                <label>
-                  OTP Code *
-                  <input
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="Enter 6-digit OTP"
-                    maxLength="6"
-                  />
-                </label>
+              <p className="signup-bottom-text">
+                Already have an account? <Link to="/login">Login here</Link>
+              </p>
+            </form>
+          )}
 
-                <button type="submit" disabled={loading || secondsLeft <= 0}>
-                  {loading ? "Verifying..." : "Verify & Create Account"}
-                </button>
+          {step === 2 && (
+            <form className="signup-form" onSubmit={verifyOtpAndCreateAccount}>
+              <span className="signup-step">Step 2</span>
 
-                <button type="button" className="secondary-btn" onClick={regenerateOtp}>
-                  Generate New OTP
-                </button>
-              </form>
-            </>
+              <h2>Verify OTP</h2>
+
+              <p>
+                Enter the 6-digit OTP sent to <strong>{form.email}</strong>.
+              </p>
+
+              <div className="otp-timer-box">
+                OTP expires in {minutes}:{seconds}
+              </div>
+
+              <label>
+                OTP Code *
+                <input
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                  placeholder="Enter 6-digit OTP"
+                  maxLength={6}
+                />
+              </label>
+
+              {message.text && (
+                <div className={`signup-message ${message.type}`}>
+                  {message.text}
+                </div>
+              )}
+
+              <button type="submit" disabled={loading || timer <= 0}>
+                {loading ? "Creating Account..." : "Verify & Create Account"}
+              </button>
+
+              <button
+                type="button"
+                className="secondary-signup-btn"
+                onClick={resendOtp}
+                disabled={loading || timer > 0}
+              >
+                Generate New OTP
+              </button>
+
+              <button
+                type="button"
+                className="secondary-signup-btn"
+                onClick={() => {
+                  setStep(1);
+                  setOtp("");
+                  showMessage("", "");
+                }}
+              >
+                Back to Details
+              </button>
+            </form>
           )}
         </div>
       </section>

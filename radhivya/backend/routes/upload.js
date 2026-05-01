@@ -1,69 +1,146 @@
 const express = require("express");
-const multer = require("multer");
 const supabase = require("../config/supabase");
-const requireAdmin = require("../middleware/requireAdmin");
 
 const router = express.Router();
 
-const storage = multer.memoryStorage();
-
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-});
-
-function cleanFileName(name) {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9.-]/g, "");
-}
-
-router.post("/product-image", requireAdmin, upload.single("image"), async (req, res) => {
+router.post("/tickets", async (req, res) => {
   try {
-    if (!req.file) {
+    const {
+      customer_name,
+      customer_email,
+      customer_phone,
+      subject,
+      message,
+    } = req.body;
+
+    if (!customer_email || !subject || !message) {
       return res.status(400).json({
         success: false,
-        message: "No image file uploaded.",
+        message: "Email, subject, and message are required.",
       });
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const { data, error } = await supabase
+      .from("support_tickets")
+      .insert([
+        {
+          customer_name: customer_name || "Customer",
+          customer_email,
+          customer_phone: customer_phone || "",
+          subject,
+          message,
+          status: "open",
+        },
+      ])
+      .select()
+      .single();
 
-    if (!allowedTypes.includes(req.file.mimetype)) {
-      return res.status(400).json({
+    if (error) {
+      return res.status(500).json({
         success: false,
-        message: "Only JPG, PNG, and WEBP images are allowed.",
+        message: "Supabase failed to create support ticket.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
       });
     }
 
-    const fileName = `${Date.now()}-${cleanFileName(req.file.originalname)}`;
-    const filePath = `products/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from("product-images")
-      .upload(filePath, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: false,
-      });
-
-    if (error) throw error;
-
-    const { data } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(filePath);
-
-    res.json({
+    res.status(201).json({
       success: true,
-      message: "Image uploaded successfully.",
-      image_url: data.publicUrl,
+      message: "Support ticket created successfully.",
+      ticket: data,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to upload image.",
+      message: "Failed to create support ticket.",
+      error: error.message,
+    });
+  }
+});
+
+router.get("/tickets", async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    let query = supabase
+      .from("support_tickets")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (email) {
+      query = query.eq("customer_email", email);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Supabase failed to load tickets.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
+
+    res.json({
+      success: true,
+      tickets: data || [],
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to load support tickets.",
+      error: error.message,
+    });
+  }
+});
+
+router.patch("/tickets/:id/reply", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { staff_reply, replied_by } = req.body;
+
+    if (!staff_reply) {
+      return res.status(400).json({
+        success: false,
+        message: "Reply is required.",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("support_tickets")
+      .update({
+        staff_reply,
+        replied_by: replied_by || "Staff",
+        replied_at: new Date().toISOString(),
+        status: "replied",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Supabase failed to send reply.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Reply sent successfully.",
+      ticket: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to reply to ticket.",
       error: error.message,
     });
   }

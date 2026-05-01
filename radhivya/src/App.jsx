@@ -24,6 +24,8 @@ import PaymentPage from "./pages/PaymentPage.jsx";
 import InvoicePage from "./pages/InvoicePage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import ChatBot from "./components/ChatBot.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 
 export default function App() {
   return (
@@ -55,6 +57,8 @@ export default function App() {
         <Route path="/invoice" element={<InvoicePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/ChatBot" element={<ChatBot />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

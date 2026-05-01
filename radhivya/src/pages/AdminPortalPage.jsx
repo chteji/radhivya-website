@@ -1,8 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  approveTrackingStage,
+  getNextPendingStage,
+  normalizeTracking,
+  saveOrders,
+} from "../utils/orderWorkflow.js";
 import "./AdminPortalPage.css";
-import { approveTrackingStage, getNextPendingStage, normalizeTracking, saveOrders } from "../utils/orderWorkflow.js";
 
 const API_URL = "http://localhost:5000";
+
+const tabs = [
+  "Dashboard",
+  "Products",
+  "Orders",
+  "Payments",
+  "Customers",
+  "Coupons",
+  "Staff",
+  "Settings",
+];
 
 const emptyProductForm = {
   name: "",
@@ -51,15 +67,6 @@ const emptyStaffForm = {
   status: "active",
 };
 
-const emptyTrackingForm = {
-  order_number: "",
-  status: "Order Confirmed",
-  location: "",
-  tracking_date: "",
-  tracking_time: "",
-  note: "",
-};
-
 const emptySettingsForm = {
   store_name: "Radhivya",
   support_email: "support@radhivya.com",
@@ -69,31 +76,8 @@ const emptySettingsForm = {
     "Free shipping above ₹999 • Premium skincare rituals by Radhivya",
 };
 
-const tabs = [
-  "Dashboard",
-  "Products",
-  "Orders",
-  "Payments",
-  "Customers",
-  "Coupons",
-  "Staff",
-  "Settings",
-];
-
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
-}
-
-function getProductImage(product) {
-  const mainImage = product.product_images?.find((img) => img.is_main);
-  const firstImage = product.product_images?.[0];
-
-  return (
-    product.image_url ||
-    mainImage?.image_url ||
-    firstImage?.image_url ||
-    "/logo-transparent.png"
-  );
 }
 
 function getLocalOrders() {
@@ -106,6 +90,18 @@ function getLocalOrders() {
 
 function getAdminName() {
   return localStorage.getItem("adminName") || "Radhivya Admin";
+}
+
+function getProductImage(product) {
+  const mainImage = product.product_images?.find((img) => img.is_main);
+  const firstImage = product.product_images?.[0];
+
+  return (
+    product.image_url ||
+    mainImage?.image_url ||
+    firstImage?.image_url ||
+    "/logo-transparent.png"
+  );
 }
 
 export default function AdminPortalPage() {
@@ -121,12 +117,11 @@ export default function AdminPortalPage() {
   const [productForm, setProductForm] = useState(emptyProductForm);
   const [couponForm, setCouponForm] = useState(emptyCouponForm);
   const [staffForm, setStaffForm] = useState(emptyStaffForm);
-  const [trackingForm, setTrackingForm] = useState(emptyTrackingForm);
   const [settingsForm, setSettingsForm] = useState(emptySettingsForm);
 
   const [productImages, setProductImages] = useState(Array(10).fill(""));
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [loading, setLoading] = useState(false);
 
   const isAdminLoggedIn = localStorage.getItem("userRole") === "admin";
 
@@ -264,15 +259,6 @@ export default function AdminPortalPage() {
     const { name, value } = e.target;
 
     setStaffForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function handleTrackingChange(e) {
-    const { name, value } = e.target;
-
-    setTrackingForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -430,65 +416,50 @@ export default function AdminPortalPage() {
     }
   }
 
-  async function addTrackingUpdate(e) {
-    e.preventDefault();
+  function approveNextTrackingStep(orderNumber) {
+    const order = orders.find((item) => item.order_number === orderNumber);
 
-    try {
-      setLoading(true);
-
-      const response = await fetch(`${API_URL}/api/business/tracking`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": "admin",
-        },
-        body: JSON.stringify({
-          ...trackingForm,
-          updated_by: getAdminName(),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(
-          data.message || data.error || "Failed to add tracking update."
-        );
-      }
-
-      const updatedOrders = orders.map((order) => {
-        if (order.order_number !== trackingForm.order_number) return order;
-
-        const newTracking = {
-          status: trackingForm.status,
-          location: trackingForm.location,
-          date:
-            trackingForm.tracking_date ||
-            new Date().toLocaleDateString(),
-          time:
-            trackingForm.tracking_time ||
-            new Date().toLocaleTimeString(),
-          note: trackingForm.note,
-          completed: true,
-        };
-
-        return {
-          ...order,
-          order_status: trackingForm.status,
-          tracking: [...safeArray(order.tracking), newTracking],
-        };
-      });
-
-      setOrders(updatedOrders);
-      localStorage.setItem("radhivyaOrders", JSON.stringify(updatedOrders));
-
-      showMessage("success", "Tracking update added successfully.");
-      setTrackingForm(emptyTrackingForm);
-    } catch (error) {
-      showMessage("error", error.message);
-    } finally {
-      setLoading(false);
+    if (!order) {
+      showMessage("error", "Order not found.");
+      return;
     }
+
+    const nextStage = getNextPendingStage(order);
+
+    if (!nextStage) {
+      showMessage("error", "All tracking steps are already completed.");
+      return;
+    }
+
+    const adminNote = window.prompt(
+      `Add note for "${nextStage.status}" step:`,
+      `${nextStage.status} approved by admin.`
+    );
+
+    const updatedOrders = orders.map((item) => {
+      if (item.order_number !== orderNumber) return item;
+
+      return approveTrackingStage(
+        item,
+        nextStage.key,
+        adminNote || `${nextStage.status} approved by admin.`,
+        getAdminName()
+      );
+    });
+
+    setOrders(updatedOrders);
+    saveOrders(updatedOrders);
+
+    const updatedOrder = updatedOrders.find(
+      (item) => item.order_number === orderNumber
+    );
+
+    if (updatedOrder) {
+      localStorage.setItem("radhivyaInvoice", JSON.stringify(updatedOrder));
+      localStorage.setItem("radhivyaLastOrder", JSON.stringify(updatedOrder));
+    }
+
+    showMessage("success", `Approved: ${nextStage.status}`);
   }
 
   function saveSettings(e) {
@@ -510,9 +481,20 @@ export default function AdminPortalPage() {
       0
     );
 
+    const pendingOrders = orders.filter((order) => {
+      const tracking = normalizeTracking(
+        order.tracking || [],
+        order.created_at,
+        order.customer?.city
+      );
+
+      return tracking.some((step) => !step.completed);
+    }).length;
+
     return {
       products: products.length,
       orders: orders.length,
+      pendingOrders,
       customers: customers.length,
       revenue: totalRevenue,
       coupons: coupons.length,
@@ -573,8 +555,8 @@ export default function AdminPortalPage() {
             <span className="admin-eyebrow">Luxury Store Management</span>
             <h1>Admin Portal</h1>
             <p>
-              Control products, orders, payments, customers, coupons, staff,
-              tracking, and settings.
+              Manage products, approve order tracking, view customers, create
+              coupons, manage staff, and control store settings.
             </p>
           </div>
 
@@ -605,7 +587,13 @@ export default function AdminPortalPage() {
               <div className="admin-stat-card">
                 <span>Total Orders</span>
                 <strong>{dashboardStats.orders}</strong>
-                <p>Customer orders stored.</p>
+                <p>Orders placed by customers.</p>
+              </div>
+
+              <div className="admin-stat-card">
+                <span>Pending Tracking</span>
+                <strong>{dashboardStats.pendingOrders}</strong>
+                <p>Orders waiting for step approval.</p>
               </div>
 
               <div className="admin-stat-card">
@@ -625,12 +613,6 @@ export default function AdminPortalPage() {
                 <strong>{dashboardStats.coupons}</strong>
                 <p>Admin-created offers.</p>
               </div>
-
-              <div className="admin-stat-card">
-                <span>Staff</span>
-                <strong>{dashboardStats.staff}</strong>
-                <p>Staff accounts.</p>
-              </div>
             </section>
 
             <section className="admin-panel-card admin-dashboard-highlight">
@@ -638,9 +620,9 @@ export default function AdminPortalPage() {
                 <span className="admin-eyebrow">Today Focus</span>
                 <h2>Luxury operations overview</h2>
                 <p>
-                  Manage every important business action from here: add products,
-                  create coupon campaigns, update delivery tracking, monitor
-                  customer records, and control staff access.
+                  Use this dashboard to approve order delivery steps, add
+                  products, create coupons, check customer records, and manage
+                  staff access.
                 </p>
               </div>
 
@@ -648,11 +630,11 @@ export default function AdminPortalPage() {
                 <button onClick={() => setActiveTab("Products")}>
                   Add Product
                 </button>
+                <button onClick={() => setActiveTab("Orders")}>
+                  Approve Tracking
+                </button>
                 <button onClick={() => setActiveTab("Coupons")}>
                   Create Coupon
-                </button>
-                <button onClick={() => setActiveTab("Orders")}>
-                  Update Tracking
                 </button>
                 <button onClick={() => setActiveTab("Staff")}>
                   Create Staff
@@ -808,7 +790,10 @@ export default function AdminPortalPage() {
 
                 <div className="admin-image-section">
                   <h3>Product Images</h3>
-                  <p>Add up to 10 product image URLs. First image becomes main image.</p>
+                  <p>
+                    Add up to 10 product image URLs. First image becomes main
+                    image.
+                  </p>
 
                   <div className="image-upload-grid">
                     {productImages.map((image, index) => (
@@ -872,78 +857,31 @@ export default function AdminPortalPage() {
         )}
 
         {activeTab === "Orders" && (
-          <>
-            <section className="admin-form-card">
-              <h2>Update Order Tracking</h2>
+          <section className="admin-list-card">
+            <h2>Orders / Approve Tracking</h2>
 
-              <form className="admin-form" onSubmit={addTrackingUpdate}>
-                <div className="admin-form-grid">
-                  <input
-                    name="order_number"
-                    value={trackingForm.order_number}
-                    onChange={handleTrackingChange}
-                    placeholder="Order number, e.g. RAD-123"
-                  />
+            {orders.length === 0 ? (
+              <div className="admin-empty">
+                No orders yet. Customer orders will appear here after checkout.
+              </div>
+            ) : (
+              <div className="admin-order-grid">
+                {orders.map((order) => {
+                  const cleanTracking = normalizeTracking(
+                    order.tracking || [],
+                    order.created_at,
+                    order.customer?.city
+                  );
 
-                  <select
-                    name="status"
-                    value={trackingForm.status}
-                    onChange={handleTrackingChange}
-                  >
-                    <option>Order Confirmed</option>
-                    <option>Packed</option>
-                    <option>Shipped</option>
-                    <option>Out for Delivery</option>
-                    <option>Delivered</option>
-                    <option>Delayed</option>
-                    <option>Cancelled</option>
-                  </select>
+                  const nextStage = cleanTracking.find((step) => !step.completed);
+                  const delivered = cleanTracking.find(
+                    (step) => step.key === "delivered" && step.completed
+                  );
 
-                  <input
-                    name="location"
-                    value={trackingForm.location}
-                    onChange={handleTrackingChange}
-                    placeholder="Location"
-                  />
-
-                  <input
-                    name="tracking_date"
-                    type="date"
-                    value={trackingForm.tracking_date}
-                    onChange={handleTrackingChange}
-                  />
-
-                  <input
-                    name="tracking_time"
-                    type="time"
-                    value={trackingForm.tracking_time}
-                    onChange={handleTrackingChange}
-                  />
-                </div>
-
-                <textarea
-                  name="note"
-                  value={trackingForm.note}
-                  onChange={handleTrackingChange}
-                  placeholder="Tracking note"
-                />
-
-                <button type="submit">Add Tracking Update</button>
-              </form>
-            </section>
-
-            <section className="admin-list-card">
-              <h2>Orders</h2>
-
-              {orders.length === 0 ? (
-                <div className="admin-empty">
-                  No local orders yet. Orders will appear after checkout.
-                </div>
-              ) : (
-                <div className="admin-order-grid">
-                  {orders.map((order) => (
+                  return (
                     <article className="admin-order-card" key={order.id}>
                       <h3>{order.order_number}</h3>
+
                       <p>
                         Customer: {order.customer?.full_name || "Customer"} ·{" "}
                         {order.customer?.email}
@@ -951,28 +889,45 @@ export default function AdminPortalPage() {
 
                       <span className="admin-badge">₹{order.total}</span>
                       <span className="admin-badge">
-                        {order.order_status || "Pending"}
+                        {delivered ? "Delivered" : order.order_status || "Order Placed"}
                       </span>
                       <span className="admin-badge">
                         {order.payment_status || "pending"}
                       </span>
+                      <span className="admin-badge">7-day delivery timeline</span>
 
                       <div className="admin-mini-list">
-                        {safeArray(order.tracking).map((track, index) => (
-                          <div key={index}>
+                        {cleanTracking.map((track) => (
+                          <div
+                            key={track.key}
+                            className={track.completed ? "completed" : ""}
+                          >
                             <strong>{track.status}</strong>
                             <p>
+                              {track.completed ? "Approved" : "Pending"} ·{" "}
                               {track.location} · {track.date} · {track.time}
                             </p>
+
+                            {track.admin_note && <small>{track.admin_note}</small>}
                           </div>
                         ))}
                       </div>
+
+                      <button
+                        className="admin-primary-btn"
+                        onClick={() => approveNextTrackingStep(order.order_number)}
+                        disabled={!nextStage}
+                      >
+                        {nextStage
+                          ? `Approve: ${nextStage.status}`
+                          : "All Steps Completed"}
+                      </button>
                     </article>
-                  ))}
-                </div>
-              )}
-            </section>
-          </>
+                  );
+                })}
+              </div>
+            )}
+          </section>
         )}
 
         {activeTab === "Payments" && (
@@ -981,8 +936,8 @@ export default function AdminPortalPage() {
 
             {payments.length === 0 ? (
               <div className="admin-empty">
-                No payment records found yet. Payment integration records will
-                show here.
+                No payment records found yet. Payment records will show here
+                after backend payment integration.
               </div>
             ) : (
               <div className="admin-payment-grid">
@@ -1152,9 +1107,7 @@ export default function AdminPortalPage() {
                         {coupon.discount_value}
                         {coupon.discount_type === "percentage" ? "%" : "₹"}
                       </span>
-                      <span className="admin-badge">
-                        {coupon.status}
-                      </span>
+                      <span className="admin-badge">{coupon.status}</span>
                       <span className="admin-badge">
                         Used {coupon.used_count || 0}/{coupon.usage_limit || 0}
                       </span>

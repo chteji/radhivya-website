@@ -24,9 +24,9 @@ router.post("/tickets", async (req, res) => {
       .from("support_tickets")
       .insert([
         {
-          customer_name,
+          customer_name: customer_name || "Customer",
           customer_email,
-          customer_phone,
+          customer_phone: customer_phone || "",
           subject,
           message,
           status: "open",
@@ -35,11 +35,19 @@ router.post("/tickets", async (req, res) => {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Supabase failed to create support ticket.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
 
     res.status(201).json({
       success: true,
-      message: "Support query sent successfully.",
+      message: "Support ticket created successfully.",
       ticket: data,
     });
   } catch (error) {
@@ -66,7 +74,15 @@ router.get("/tickets", async (req, res) => {
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Supabase failed to load tickets.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
 
     res.json({
       success: true,
@@ -106,7 +122,15 @@ router.patch("/tickets/:id/reply", async (req, res) => {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Supabase failed to send reply.",
+        error: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
 
     res.json({
       success: true,

@@ -18,6 +18,8 @@ const adminRoutes = require("./routes/admin");
 const uploadRoutes = require("./routes/upload");
 const staffRoutes = require("./routes/staff");
 const orderEmailRoutes = require("./routes/orderEmail");
+const emailOtpRoutes = require("./routes/emailOtp");
+const customerAuthRoutes = require("./routes/customerAuth");
 
 /* =========================
    MIDDLEWARE
@@ -70,6 +72,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/order-email", orderEmailRoutes);
+app.use("/api/email-otp", emailOtpRoutes);
+app.use("/api/customer-auth", customerAuthRoutes);
 
 
 /* =========================

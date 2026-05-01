@@ -7,9 +7,55 @@ import "./ProfilePage.css";
 
 const API_URL = "http://localhost:5000";
 
+const profileTabs = [
+  "Customer Info",
+  "Order History",
+  "Tracking",
+  "Inbox",
+  "Edit Profile",
+];
+
+function getCurrentCustomerEmail() {
+  return String(localStorage.getItem("customerEmail") || "")
+    .trim()
+    .toLowerCase();
+}
+
+function getCurrentCustomerId() {
+  return String(localStorage.getItem("customerId") || "").trim();
+}
+
 function readOrders() {
   try {
-    return JSON.parse(localStorage.getItem("radhivyaOrders") || "[]");
+    const currentEmail = getCurrentCustomerEmail();
+    const currentCustomerId = getCurrentCustomerId();
+
+    const allOrders = JSON.parse(localStorage.getItem("radhivyaOrders") || "[]");
+
+    if (!currentEmail && !currentCustomerId) return [];
+
+    return allOrders.filter((order) => {
+      const orderEmail =
+        order.customer?.email ||
+        order.customer_email ||
+        order.email ||
+        "";
+
+      const orderCustomerId =
+        order.customer?.id ||
+        order.customer_id ||
+        "";
+
+      const emailMatches =
+        currentEmail &&
+        String(orderEmail).trim().toLowerCase() === currentEmail;
+
+      const idMatches =
+        currentCustomerId &&
+        String(orderCustomerId).trim() === currentCustomerId;
+
+      return emailMatches || idMatches;
+    });
   } catch {
     return [];
   }
@@ -51,11 +97,11 @@ export default function ProfilePage() {
 
   const savedProfile = getSavedProfile();
 
+  const [activeProfileTab, setActiveProfileTab] = useState("Customer Info");
   const [orders, setOrders] = useState(readOrders());
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [supportTickets, setSupportTickets] = useState([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
-  const [profileMode, setProfileMode] = useState("view");
 
   const [profileForm, setProfileForm] = useState({
     full_name:
@@ -73,19 +119,20 @@ export default function ProfilePage() {
     country: savedProfile?.country || "India",
   });
 
-  const customerName = profileForm.full_name || "Radhivya Customer";
-  const customerEmail = profileForm.email || "customer@radhivya.com";
-  const customerPhone = profileForm.phone || "Not added";
-
-  const selectedOrder =
-    orders.find((order) => order.id === selectedOrderId) || orders[0];
-
   useEffect(() => {
+    const currentRole = localStorage.getItem("userRole");
+
+    if (currentRole !== "customer") {
+      navigate("/login");
+      return;
+    }
+
+    setOrders(readOrders());
     loadSupportInbox();
   }, []);
 
   async function loadSupportInbox() {
-    const email = localStorage.getItem("customerEmail");
+    const email = getCurrentCustomerEmail();
 
     if (!email) return;
 
@@ -108,6 +155,14 @@ export default function ProfilePage() {
     }
   }
 
+  const customerName = profileForm.full_name || "Radhivya Customer";
+  const customerEmail = profileForm.email || "customer@radhivya.com";
+  const customerPhone = profileForm.phone || "Not added";
+
+  const selectedOrder =
+    orders.find((order) => String(order.id) === String(selectedOrderId)) ||
+    orders[0];
+
   const totalSpent = useMemo(() => {
     return orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
   }, [orders]);
@@ -128,12 +183,18 @@ export default function ProfilePage() {
   function saveProfile(e) {
     e.preventDefault();
 
-    localStorage.setItem("radhivyaCustomerProfile", JSON.stringify(profileForm));
-    localStorage.setItem("userName", profileForm.full_name);
-    localStorage.setItem("customerEmail", profileForm.email);
-    localStorage.setItem("customerPhone", profileForm.phone);
+    const updatedProfile = {
+      ...profileForm,
+      id: localStorage.getItem("customerId") || savedProfile?.id || "",
+    };
 
-    setProfileMode("view");
+    localStorage.setItem("radhivyaCustomerProfile", JSON.stringify(updatedProfile));
+    localStorage.setItem("userName", updatedProfile.full_name);
+    localStorage.setItem("customerEmail", updatedProfile.email);
+    localStorage.setItem("customerPhone", updatedProfile.phone);
+
+    setActiveProfileTab("Customer Info");
+    setOrders(readOrders());
   }
 
   function logoutCustomer() {
@@ -142,6 +203,7 @@ export default function ProfilePage() {
     localStorage.removeItem("userName");
     localStorage.removeItem("customerEmail");
     localStorage.removeItem("customerPhone");
+    localStorage.removeItem("radhivyaCustomerProfile");
 
     navigate("/login");
   }
@@ -178,10 +240,22 @@ export default function ProfilePage() {
             <span>Customer Profile</span>
             <h1>Your Radhivya account</h1>
             <p>
-              Manage your profile, saved address, order history, invoices,
-              tracking, and support inbox.
+              Manage your own customer details, orders, tracking, invoices and
+              support inbox.
             </p>
           </div>
+
+          <nav className="profile-inner-nav">
+            {profileTabs.map((tab) => (
+              <button
+                key={tab}
+                className={activeProfileTab === tab ? "active" : ""}
+                onClick={() => setActiveProfileTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </nav>
 
           <div className="profile-layout">
             <aside className="profile-sidebar">
@@ -224,31 +298,22 @@ export default function ProfilePage() {
             </aside>
 
             <section className="profile-main">
-              <section className="profile-main-card">
-                <div className="profile-section-title-row">
-                  <div>
-                    <span>Personal Details</span>
-                    <h2>Customer information</h2>
-                  </div>
+              {activeProfileTab === "Customer Info" && (
+                <section className="profile-main-card">
+                  <div className="profile-section-title-row">
+                    <div>
+                      <span>Personal Details</span>
+                      <h2>Customer information</h2>
+                    </div>
 
-                  {profileMode === "view" ? (
                     <button
                       className="profile-small-btn"
-                      onClick={() => setProfileMode("edit")}
+                      onClick={() => setActiveProfileTab("Edit Profile")}
                     >
                       Edit Profile
                     </button>
-                  ) : (
-                    <button
-                      className="profile-small-btn secondary"
-                      onClick={() => setProfileMode("view")}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
+                  </div>
 
-                {profileMode === "view" ? (
                   <div className="profile-info-grid">
                     <div className="profile-info-box">
                       <span>Name</span>
@@ -282,7 +347,16 @@ export default function ProfilePage() {
                       </strong>
                     </div>
                   </div>
-                ) : (
+                </section>
+              )}
+
+              {activeProfileTab === "Edit Profile" && (
+                <section className="profile-main-card">
+                  <div className="profile-section-title">
+                    <span>Edit Profile</span>
+                    <h2>Update your details</h2>
+                  </div>
+
                   <form className="profile-edit-form" onSubmit={saveProfile}>
                     <div className="profile-edit-grid">
                       <label>
@@ -381,27 +455,122 @@ export default function ProfilePage() {
 
                     <button type="submit">Save Profile</button>
                   </form>
-                )}
-              </section>
+                </section>
+              )}
 
-              <section className="profile-order-history-card">
-                <div className="profile-section-title">
-                  <span>Order History</span>
-                  <h2>Your placed orders</h2>
-                </div>
-
-                {orders.length === 0 ? (
-                  <div className="profile-empty">
-                    No orders yet. Place your first Radhivya order and it will
-                    appear here.
+              {activeProfileTab === "Order History" && (
+                <section className="profile-order-history-card">
+                  <div className="profile-section-title">
+                    <span>Order History</span>
+                    <h2>Your placed orders</h2>
                   </div>
-                ) : (
-                  <div className="profile-order-history-layout">
-                    <div className="profile-order-list">
-                      {orders.map((order) => {
-                        const delivered = getDeliveredStep(order);
 
-                        return (
+                  {orders.length === 0 ? (
+                    <div className="profile-empty">
+                      No orders yet for this customer account. Place your first
+                      Radhivya order and it will appear here.
+                    </div>
+                  ) : (
+                    <div className="profile-order-history-layout">
+                      <div className="profile-order-list">
+                        {orders.map((order) => {
+                          const delivered = getDeliveredStep(order);
+
+                          return (
+                            <button
+                              key={order.id}
+                              className={`profile-order-list-item ${
+                                selectedOrder?.id === order.id ? "active" : ""
+                              }`}
+                              onClick={() => setSelectedOrderId(order.id)}
+                            >
+                              <div>
+                                <strong>{order.order_number}</strong>
+                                <span>
+                                  {new Date(order.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+
+                              <div>
+                                <strong>₹{order.total}</strong>
+                                <span>
+                                  {delivered ? "Delivered" : order.order_status}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {selectedOrder && (
+                        <div className="profile-order-detail">
+                          <div className="order-detail-head">
+                            <div>
+                              <span>Selected Order</span>
+                              <h3>{selectedOrder.order_number}</h3>
+                            </div>
+
+                            <button onClick={() => openInvoice(selectedOrder)}>
+                              View Invoice
+                            </button>
+                          </div>
+
+                          <div className="order-detail-grid">
+                            <div>
+                              <span>Total</span>
+                              <strong>₹{selectedOrder.total}</strong>
+                            </div>
+
+                            <div>
+                              <span>Payment</span>
+                              <strong>{selectedOrder.payment_status}</strong>
+                            </div>
+
+                            <div>
+                              <span>Status</span>
+                              <strong>{selectedOrder.order_status}</strong>
+                            </div>
+
+                            <div>
+                              <span>Coupon</span>
+                              <strong>
+                                {selectedOrder.coupon_code || "No coupon"}
+                              </strong>
+                            </div>
+                          </div>
+
+                          <div className="order-items-list">
+                            {(selectedOrder.items || []).map((item, index) => (
+                              <div key={`${item.id}-${index}`}>
+                                <strong>{item.name}</strong>
+                                <span>
+                                  Qty {item.quantity || 1} · ₹{item.price}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {activeProfileTab === "Tracking" && (
+                <section className="profile-order-history-card">
+                  <div className="profile-section-title">
+                    <span>Tracking</span>
+                    <h2>Your order tracking</h2>
+                  </div>
+
+                  {orders.length === 0 ? (
+                    <div className="profile-empty">
+                      No tracking available because this customer has no orders.
+                    </div>
+                  ) : (
+                    <div className="profile-order-history-layout">
+                      <div className="profile-order-list">
+                        {orders.map((order) => (
                           <button
                             key={order.id}
                             className={`profile-order-list-item ${
@@ -411,174 +580,137 @@ export default function ProfilePage() {
                           >
                             <div>
                               <strong>{order.order_number}</strong>
-                              <span>
-                                {new Date(order.created_at).toLocaleDateString()}
-                              </span>
+                              <span>{order.order_status}</span>
                             </div>
 
                             <div>
                               <strong>₹{order.total}</strong>
                               <span>
-                                {delivered ? "Delivered" : order.order_status}
+                                {new Date(order.created_at).toLocaleDateString()}
                               </span>
                             </div>
                           </button>
-                        );
-                      })}
-                    </div>
+                        ))}
+                      </div>
 
-                    {selectedOrder && (
-                      <div className="profile-order-detail">
-                        <div className="order-detail-head">
-                          <div>
-                            <span>Selected Order</span>
-                            <h3>{selectedOrder.order_number}</h3>
-                          </div>
-
-                          <button onClick={() => openInvoice(selectedOrder)}>
-                            View Invoice
-                          </button>
-                        </div>
-
-                        <div className="order-detail-grid">
-                          <div>
-                            <span>Total</span>
-                            <strong>₹{selectedOrder.total}</strong>
-                          </div>
-
-                          <div>
-                            <span>Payment</span>
-                            <strong>{selectedOrder.payment_status}</strong>
-                          </div>
-
-                          <div>
-                            <span>Status</span>
-                            <strong>{selectedOrder.order_status}</strong>
-                          </div>
-
-                          <div>
-                            <span>Coupon</span>
-                            <strong>
-                              {selectedOrder.coupon_code || "No coupon"}
-                            </strong>
-                          </div>
-                        </div>
-
-                        <div className="order-items-list">
-                          {(selectedOrder.items || []).map((item, index) => (
-                            <div key={`${item.id}-${index}`}>
-                              <strong>{item.name}</strong>
-                              <span>
-                                Qty {item.quantity || 1} · ₹{item.price}
-                              </span>
+                      {selectedOrder && (
+                        <div className="profile-order-detail">
+                          <div className="order-detail-head">
+                            <div>
+                              <span>Selected Tracking</span>
+                              <h3>{selectedOrder.order_number}</h3>
                             </div>
-                          ))}
-                        </div>
-
-                        {selectedDeliveredStep ? (
-                          <div className="delivered-summary">
-                            <h4>Delivered Order Summary</h4>
-                            <p>
-                              Accepted:{" "}
-                              {selectedAcceptedStep?.date || "Order accepted"}
-                            </p>
-                            <p>
-                              Delivered: {selectedDeliveredStep.date} ·{" "}
-                              {selectedDeliveredStep.time}
-                            </p>
                           </div>
-                        ) : (
-                          <div className="tracking-steps">
-                            {selectedTracking.map((step) => (
-                              <div
-                                className={`tracking-step ${
-                                  step.completed ? "completed" : ""
-                                }`}
-                                key={`${selectedOrder.id}-${step.key}`}
-                              >
-                                <div className="tracking-dot"></div>
 
-                                <div className="tracking-step-content">
-                                  <h4>{step.status}</h4>
-                                  <p>{step.admin_note || step.note}</p>
+                          {selectedDeliveredStep ? (
+                            <div className="delivered-summary">
+                              <h4>Delivered Order Summary</h4>
+                              <p>
+                                Accepted:{" "}
+                                {selectedAcceptedStep?.date || "Order accepted"}
+                              </p>
+                              <p>
+                                Delivered: {selectedDeliveredStep.date} ·{" "}
+                                {selectedDeliveredStep.time}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="tracking-steps">
+                              {selectedTracking.map((step) => (
+                                <div
+                                  className={`tracking-step ${
+                                    step.completed ? "completed" : ""
+                                  }`}
+                                  key={`${selectedOrder.id}-${step.key}`}
+                                >
+                                  <div className="tracking-dot"></div>
 
-                                  <div>
-                                    <span>{step.location}</span>
-                                    <span>
-                                      {step.completed ? "Approved" : "Expected"}
-                                    </span>
-                                    <span>{step.date}</span>
-                                    <span>{step.time}</span>
+                                  <div className="tracking-step-content">
+                                    <h4>{step.status}</h4>
+                                    <p>{step.admin_note || step.note}</p>
+
+                                    <div>
+                                      <span>{step.location}</span>
+                                      <span>
+                                        {step.completed
+                                          ? "Approved"
+                                          : "Expected"}
+                                      </span>
+                                      <span>{step.date}</span>
+                                      <span>{step.time}</span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-
-              <section className="profile-support-card">
-                <div className="profile-section-title">
-                  <span>Inbox / Support</span>
-                  <h2>Your messages with staff</h2>
-                </div>
-
-                {loadingTickets ? (
-                  <div className="profile-empty">Loading your inbox...</div>
-                ) : supportTickets.length === 0 ? (
-                  <div className="profile-empty">
-                    No support messages yet. Use the robot chat button on the
-                    right side of the website to ask staff anything.
-                  </div>
-                ) : (
-                  <div className="profile-support-list">
-                    {supportTickets.map((ticket) => (
-                      <article
-                        className="profile-support-ticket"
-                        key={ticket.id}
-                      >
-                        <h3>{ticket.subject}</h3>
-                        <p>{ticket.message}</p>
-
-                        <div className="profile-ticket-badges">
-                          <span>{ticket.status}</span>
-                          <span>
-                            Sent {new Date(ticket.created_at).toLocaleString()}
-                          </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+              )}
 
-                        {ticket.staff_reply ? (
-                          <div className="profile-staff-reply">
-                            <strong>
-                              Staff Reply
-                              {ticket.replied_by
-                                ? ` from ${ticket.replied_by}`
-                                : ""}
-                            </strong>
-
-                            <p>{ticket.staff_reply}</p>
-
-                            {ticket.replied_at && (
-                              <small>
-                                Replied on{" "}
-                                {new Date(ticket.replied_at).toLocaleString()}
-                              </small>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="profile-waiting-reply">
-                            Staff has not replied yet.
-                          </div>
-                        )}
-                      </article>
-                    ))}
+              {activeProfileTab === "Inbox" && (
+                <section className="profile-support-card">
+                  <div className="profile-section-title">
+                    <span>Inbox / Support</span>
+                    <h2>Your messages with staff</h2>
                   </div>
-                )}
-              </section>
+
+                  {loadingTickets ? (
+                    <div className="profile-empty">Loading your inbox...</div>
+                  ) : supportTickets.length === 0 ? (
+                    <div className="profile-empty">
+                      No support messages yet. Use the robot chat button or
+                      Contact page to ask staff anything.
+                    </div>
+                  ) : (
+                    <div className="profile-support-list">
+                      {supportTickets.map((ticket) => (
+                        <article
+                          className="profile-support-ticket"
+                          key={ticket.id}
+                        >
+                          <h3>{ticket.subject}</h3>
+                          <p>{ticket.message}</p>
+
+                          <div className="profile-ticket-badges">
+                            <span>{ticket.status}</span>
+                            <span>
+                              Sent {new Date(ticket.created_at).toLocaleString()}
+                            </span>
+                          </div>
+
+                          {ticket.staff_reply ? (
+                            <div className="profile-staff-reply">
+                              <strong>
+                                Staff Reply
+                                {ticket.replied_by
+                                  ? ` from ${ticket.replied_by}`
+                                  : ""}
+                              </strong>
+
+                              <p>{ticket.staff_reply}</p>
+
+                              {ticket.replied_at && (
+                                <small>
+                                  Replied on{" "}
+                                  {new Date(ticket.replied_at).toLocaleString()}
+                                </small>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="profile-waiting-reply">
+                              Staff has not replied yet.
+                            </div>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
             </section>
           </div>
         </section>

@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./CustomerSignupPage.css";
 
 const API_URL = "http://localhost:5000";
 
-export default function CustomerLoginPage() {
+export default function ResetPasswordPage() {
+  const { token } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    email: "",
     password: "",
+    confirm_password: "",
   });
 
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -24,13 +25,29 @@ export default function CustomerLoginPage() {
     }));
   }
 
-  async function loginCustomer(e) {
+  async function resetPassword(e) {
     e.preventDefault();
 
-    if (!form.email.trim() || !form.password.trim()) {
+    if (!form.password) {
       setMessage({
         type: "error",
-        text: "Email and password are required.",
+        text: "New password is required.",
+      });
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setMessage({
+        type: "error",
+        text: "Password must be at least 6 characters.",
+      });
+      return;
+    }
+
+    if (form.password !== form.confirm_password) {
+      setMessage({
+        type: "error",
+        text: "Passwords do not match.",
       });
       return;
     }
@@ -39,13 +56,13 @@ export default function CustomerLoginPage() {
       setLoading(true);
       setMessage({ type: "", text: "" });
 
-      const response = await fetch(`${API_URL}/api/customer-auth/login`, {
+      const response = await fetch(`${API_URL}/api/customer-auth/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: form.email,
+          token,
           password: form.password,
         }),
       });
@@ -53,26 +70,17 @@ export default function CustomerLoginPage() {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.message || data.error || "Login failed.");
+        throw new Error(data.message || data.error || "Password reset failed.");
       }
-
-      const customer = data.customer;
-
-      localStorage.setItem("userRole", "customer");
-      localStorage.setItem("customerId", customer.id || "");
-      localStorage.setItem("userName", customer.full_name || "");
-      localStorage.setItem("customerEmail", customer.email || "");
-      localStorage.setItem("customerPhone", customer.phone || "");
-      localStorage.setItem("radhivyaCustomerProfile", JSON.stringify(customer));
 
       setMessage({
         type: "success",
-        text: "Login successful.",
+        text: "Password reset successfully. Redirecting to login...",
       });
 
       setTimeout(() => {
-        navigate("/profile");
-      }, 700);
+        navigate("/login");
+      }, 1100);
     } catch (error) {
       setMessage({
         type: "error",
@@ -95,51 +103,41 @@ export default function CustomerLoginPage() {
             }}
           />
 
-          <span>Customer Login</span>
+          <span>New Password</span>
 
-          <h1>Welcome back to Radhivya</h1>
+          <h1>Create a new password</h1>
 
           <p>
-            Login with the email and password you selected during customer
-            signup.
+            Set a new password for your Radhivya customer account and login
+            again.
           </p>
-
-          <ul>
-            <li>✓ Customer account login</li>
-            <li>✓ Own order history only</li>
-            <li>✓ Order tracking</li>
-            <li>✓ Invoice access</li>
-            <li>✓ Support inbox</li>
-          </ul>
         </div>
 
         <div className="signup-form-panel">
-          <form className="signup-form" onSubmit={loginCustomer}>
-            <span className="signup-step">Customer Login</span>
+          <form className="signup-form" onSubmit={resetPassword}>
+            <span className="signup-step">Reset Password</span>
 
-            <h2>Login</h2>
-
-            <p>Enter your customer email and password.</p>
+            <h2>New Password</h2>
 
             <label>
-              Email *
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Enter email"
-              />
-            </label>
-
-            <label>
-              Password *
+              New Password *
               <input
                 name="password"
                 type="password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="Enter password"
+                placeholder="Enter new password"
+              />
+            </label>
+
+            <label>
+              Confirm New Password *
+              <input
+                name="confirm_password"
+                type="password"
+                value={form.confirm_password}
+                onChange={handleChange}
+                placeholder="Confirm new password"
               />
             </label>
 
@@ -150,15 +148,11 @@ export default function CustomerLoginPage() {
             )}
 
             <button type="submit" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Updating..." : "Update Password"}
             </button>
 
             <p className="signup-bottom-text">
-              <Link to="/forgot-password">Forgot password?</Link>
-            </p>
-
-            <p className="signup-bottom-text">
-              New customer? <Link to="/signup">Create account</Link>
+              Back to <Link to="/login">Login</Link>
             </p>
           </form>
         </div>

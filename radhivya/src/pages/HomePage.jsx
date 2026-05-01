@@ -4,12 +4,33 @@ import Footer from "../components/Footer.jsx";
 import "./HomePage.css";
 
 const categories = [
-  ["🧴", "Cleansers", "Daily gentle cleansing", "/products?category=cleanser-facewash"],
-  ["✨", "Serums", "Targeted glow care", "/products?category=serum"],
-  ["💧", "Moisturizers", "Deep hydration", "/products?category=moisturizers"],
-  ["☀️", "Sunscreens", "Daily protection", "/products?category=sunscreen"],
-  ["🌿", "Face Oils", "Luxury nourishment", "/products?category=face-oil"],
-  ["🫧", "Body Care", "Complete self-care", "/products?category=body-care"],
+  {
+    title: "Cleansers",
+    text: "Gentle daily cleansing for a fresh, glowing start.",
+    link: "/products?category=Cleanser%2FFacewash",
+  },
+  {
+    title: "Serums",
+    text: "Targeted glow care for hydration, brightness, and smooth skin.",
+    link: "/products?category=Serum",
+  },
+  {
+    title: "Moisturizers",
+    text: "Soft, rich hydration for everyday skin comfort.",
+    link: "/products?category=Moisturizers",
+  },
+  {
+    title: "Face Masks",
+    text: "Premium self-care rituals for relaxing skincare moments.",
+    link: "/products?category=Face%20Mask",
+  },
+];
+
+const rituals = [
+  "Cleanse gently",
+  "Apply active serum",
+  "Lock hydration",
+  "Protect and glow",
 ];
 
 export default function HomePage() {
@@ -19,49 +40,51 @@ export default function HomePage() {
 
       <main className="home-page">
         <section className="home-hero-section">
-          <div className="home-hero-inner">
-            <div className="home-hero-content">
-              <span className="home-eyebrow">Premium Indian Skincare</span>
+          <div className="home-hero-content">
+            <span className="home-eyebrow">Premium Indian Skincare</span>
 
-              <h1>
-                Radiance <br />
-                Rooted <br />
-                in Nature
-              </h1>
+            <h1>Glow like luxury feels.</h1>
 
-              <p>
-                Radhivya blends botanical care with modern skincare rituals.
-                Discover clean, elegant, and thoughtfully crafted products for
-                healthy glowing skin.
-              </p>
+            <p>
+              Radhivya is designed for customers who want skincare that feels
+              premium, trusted, elegant, and easy to use every day.
+            </p>
 
-              <div className="home-hero-buttons">
-                <Link to="/products">Shop Products</Link>
-                <Link to="/new-arrivals">View New Arrivals</Link>
-              </div>
+            <div className="home-hero-actions">
+              <Link to="/products">Shop Collection</Link>
+              <Link to="/new-arrivals" className="secondary">
+                New Arrivals
+              </Link>
             </div>
 
-            <div className="home-hero-visual">
-              <div className="home-logo-stage">
-                <div className="home-main-orb"></div>
+            <div className="home-hero-stats">
+              <div>
+                <strong>100%</strong>
+                <span>Premium feel</span>
+              </div>
 
-                <img
-                  src="/logo-transparent.png"
-                  alt="Radhivya"
-                  onError={(e) => {
-                    e.currentTarget.src = "/logo.png";
-                  }}
-                />
+              <div>
+                <strong>11+</strong>
+                <span>Skincare categories</span>
+              </div>
 
-                <div className="home-floating-card card-one">
-                  <strong>Clean Glow</strong>
-                  <span>Botanical skincare</span>
-                </div>
+              <div>
+                <strong>7 Days</strong>
+                <span>Delivery tracking</span>
+              </div>
+            </div>
+          </div>
 
-                <div className="home-floating-card card-two">
-                  <strong>Premium Care</strong>
-                  <span>Luxury daily rituals</span>
-                </div>
+          <div className="home-hero-visual">
+            <div className="home-product-orbit orbit-one">💄</div>
+            <div className="home-product-orbit orbit-two">🧴</div>
+            <div className="home-product-orbit orbit-three">✨</div>
+
+            <div className="home-luxury-bottle">
+              <div className="bottle-cap"></div>
+              <div className="bottle-body">
+                <span>R</span>
+                <p>Radhivya</p>
               </div>
             </div>
           </div>
@@ -69,85 +92,61 @@ export default function HomePage() {
 
         <section className="home-section">
           <div className="home-section-head">
-            <span>Shop by Ritual</span>
-            <h2>Choose your skincare category</h2>
+            <span>Shop By Ritual</span>
+            <h2>Skincare categories made simple</h2>
             <p>
-              Explore products by your daily beauty routine and skin needs.
+              Customers can explore products by need, routine, or beauty goal.
             </p>
           </div>
 
           <div className="home-category-grid">
-            {categories.map(([icon, title, text, path]) => (
-              <Link to={path} className="home-category-card" key={title}>
-                <div className="home-category-icon">{icon}</div>
-                <h3>{title}</h3>
-                <p>{text}</p>
+            {categories.map((category) => (
+              <Link
+                to={category.link}
+                className="home-category-card"
+                key={category.title}
+              >
+                <span>{category.title}</span>
+                <h3>{category.title}</h3>
+                <p>{category.text}</p>
+                <strong>Explore →</strong>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="home-story-section">
-          <div className="home-story-card">
-            <span>Brand Story</span>
-            <h2>Luxury skincare made simple, graceful, and trustworthy.</h2>
+        <section className="home-ritual-section">
+          <div className="home-ritual-content">
+            <span>Daily Glow System</span>
+            <h2>Your premium skincare routine</h2>
             <p>
-              Radhivya is designed as a premium skincare experience where every
-              product feels elegant, clean, and easy to understand. From product
-              discovery to checkout, the experience is built to feel smooth,
-              modern, and reliable.
+              Build a simple routine that looks beautiful, feels luxurious, and
+              helps customers trust your brand from the first visit.
             </p>
-            <Link to="/about">Learn More</Link>
-          </div>
 
-          <div className="home-story-visual">
-            <div className="story-luxury-orb"></div>
-            <div className="story-small-card">
-              <strong>Natural care</strong>
-              <p>Inspired by gentle daily rituals.</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="home-section">
-          <div className="home-section-head">
-            <span>Daily Rituals</span>
-            <h2>Build your glow routine</h2>
-            <p>
-              A premium skincare journey built around cleansing, nourishing,
-              protecting, and glowing.
-            </p>
+            <Link to="/products">Start Shopping</Link>
           </div>
 
           <div className="home-ritual-grid">
-            <article>
-              <h3>Morning Radiance</h3>
-              <p>Cleanse, hydrate, and protect your skin for the day.</p>
-            </article>
-
-            <article>
-              <h3>Evening Repair</h3>
-              <p>Calm, restore, and nourish your skin after a long day.</p>
-            </article>
-
-            <article>
-              <h3>Glow Boost</h3>
-              <p>Add serums and oils for a bright, premium skincare finish.</p>
-            </article>
+            {rituals.map((item, index) => (
+              <article key={item}>
+                <strong>0{index + 1}</strong>
+                <h3>{item}</h3>
+                <p>
+                  A clean, attractive step in the Radhivya skincare experience.
+                </p>
+              </article>
+            ))}
           </div>
         </section>
 
-        <section className="home-final-cta">
-          <h2>Ready to discover your next skincare favourite?</h2>
-          <p>
-            Explore Radhivya products and create a clean, premium skincare
-            routine that fits your everyday lifestyle.
-          </p>
-
+        <section className="home-banner">
           <div>
-            <Link to="/products">Start Shopping</Link>
-            <Link to="/contact">Ask Support</Link>
+            <span>Luxury Customer Experience</span>
+            <h2>Premium shopping with cart, wishlist, checkout, invoice, tracking and support.</h2>
           </div>
+
+          <Link to="/products">Shop Now</Link>
         </section>
       </main>
 

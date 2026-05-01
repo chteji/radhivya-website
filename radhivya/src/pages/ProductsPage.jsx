@@ -1,207 +1,306 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import Toast from "../components/Toast.jsx";
-import {
-  isProductInCart,
-  isProductInWishlist,
-  toggleProductInCart,
-  toggleProductInWishlist,
-} from "../utils/customerStorage.js";
 import "./ProductsPage.css";
 
 const API_URL = "http://localhost:5000";
 
-const categoryButtons = [
-  ["All", "all"],
-  ["Cleanser", "cleanser-facewash"],
-  ["Serum", "serum"],
-  ["Toner", "toner"],
-  ["Moisturizers", "moisturizers"],
-  ["Face Oil", "face-oil"],
-  ["Scrub", "scrub"],
-  ["Face Mask", "face-mask"],
-  ["Eye Care", "eye-care"],
-  ["Lip Care", "lip-care"],
-  ["Body Care", "body-care"],
-  ["Hair Care", "hair-care"],
+const categories = [
+  "All",
+  "Cleanser/Facewash",
+  "Serum",
+  "Toner",
+  "Moisturizers",
+  "Face Oil",
+  "Scrub",
+  "Face Mask",
+  "Eye Care",
+  "Lip Care",
+  "Body Care",
+  "Hair Care",
 ];
 
-export default function ProductsPage() {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+const fallbackProducts = [
+  {
+    id: "demo-1",
+    name: "Golden Glow Serum",
+    price: 999,
+    old_price: 1299,
+    category: "Serum",
+    stock: 20,
+    short_description: "A premium glow serum for smooth, radiant skin.",
+    image_url:
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=900",
+  },
+  {
+    id: "demo-2",
+    name: "Soft Ritual Cleanser",
+    price: 699,
+    old_price: 899,
+    category: "Cleanser/Facewash",
+    stock: 18,
+    short_description: "Gentle daily cleanser for fresh skin.",
+    image_url:
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=900",
+  },
+  {
+    id: "demo-3",
+    name: "Velvet Moisturizer",
+    price: 899,
+    old_price: 1199,
+    category: "Moisturizers",
+    stock: 12,
+    short_description: "Rich hydration with a luxury skin feel.",
+    image_url:
+      "https://images.unsplash.com/photo-1629198735660-e39ea93f5c18?q=80&w=900",
+  },
+];
 
-  const selectedCategory = searchParams.get("category") || "all";
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem("radhivyaCart") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function getWishlist() {
+  try {
+    return JSON.parse(localStorage.getItem("radhivyaWishlist") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function getProductImage(product) {
+  const mainImage = product.product_images?.find((img) => img.is_main);
+  const firstImage = product.product_images?.[0];
+
+  return (
+    product.image_url ||
+    mainImage?.image_url ||
+    firstImage?.image_url ||
+    product.image ||
+    "/logo-transparent.png"
+  );
+}
+
+export default function ProductsPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const urlCategory =
+    new URLSearchParams(location.search).get("category") || "All";
 
   const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("newest");
-  const [stockFilter, setStockFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
+  const [searchText, setSearchText] = useState("");
+  const [sortType, setSortType] = useState("default");
+  const [priceRange, setPriceRange] = useState("all");
+  const [availability, setAvailability] = useState("all");
+
   const [toast, setToast] = useState("");
-  const [refreshState, setRefreshState] = useState(0);
+  const [cart, setCart] = useState(getCart());
+  const [wishlist, setWishlist] = useState(getWishlist());
 
   useEffect(() => {
     loadProducts();
   }, []);
 
+  useEffect(() => {
+    setSelectedCategory(urlCategory || "All");
+  }, [urlCategory]);
+
   async function loadProducts() {
     try {
-      setLoading(true);
-      setError("");
-
       const response = await fetch(`${API_URL}/api/products`);
       const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.message || "Failed to load products.");
+      if (
+        data.success &&
+        Array.isArray(data.products) &&
+        data.products.length > 0
+      ) {
+        setProducts(data.products);
+      } else {
+        setProducts(fallbackProducts);
       }
-
-      setProducts(data.products || []);
-    } catch (err) {
-      setError(err.message || "Failed to load products.");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Products load failed:", error);
+      setProducts(fallbackProducts);
     }
   }
 
   function showToast(message) {
     setToast(message);
-    setTimeout(() => setToast(""), 2500);
+    setTimeout(() => setToast(""), 2600);
   }
 
-  function changeCategory(category) {
-    if (category === "all") {
-      setSearchParams({});
+  function updateCart(nextCart) {
+    setCart(nextCart);
+    localStorage.setItem("radhivyaCart", JSON.stringify(nextCart));
+    localStorage.setItem("radhivya_cart", JSON.stringify(nextCart));
+  }
+
+  function updateWishlist(nextWishlist) {
+    setWishlist(nextWishlist);
+    localStorage.setItem("radhivyaWishlist", JSON.stringify(nextWishlist));
+  }
+
+  function addToCart(product) {
+    const exists = cart.some((item) => item.id === product.id);
+
+    if (exists) {
+      const nextCart = cart.filter((item) => item.id !== product.id);
+      updateCart(nextCart);
+      showToast("Removed from cart.");
+      return;
+    }
+
+    const nextCart = [
+      ...cart,
+      {
+        ...product,
+        quantity: 1,
+        image: getProductImage(product),
+      },
+    ];
+
+    updateCart(nextCart);
+    showToast("Yeah! Added to cart successfully.");
+  }
+
+  function buyNow(product) {
+    const nextCart = [
+      {
+        ...product,
+        quantity: 1,
+        image: getProductImage(product),
+      },
+    ];
+
+    updateCart(nextCart);
+    navigate("/checkout");
+  }
+
+  function toggleWishlist(product) {
+    const exists = wishlist.some((item) => item.id === product.id);
+
+    if (exists) {
+      const nextWishlist = wishlist.filter((item) => item.id !== product.id);
+      updateWishlist(nextWishlist);
+      showToast("Removed from wishlist.");
+      return;
+    }
+
+    const nextWishlist = [
+      ...wishlist,
+      {
+        ...product,
+        image: getProductImage(product),
+      },
+    ];
+
+    updateWishlist(nextWishlist);
+    showToast("Added to wishlist successfully.");
+  }
+
+  function selectCategory(category) {
+    setSelectedCategory(category);
+
+    if (category === "All") {
+      navigate("/products");
     } else {
-      setSearchParams({ category });
+      navigate(`/products?category=${encodeURIComponent(category)}`);
     }
   }
 
-  function getProductImage(product) {
-    const mainImage = product.product_images?.find((img) => img.is_main);
-    const firstImage = product.product_images?.[0];
-
-    return (
-      product.image_url ||
-      mainImage?.image_url ||
-      firstImage?.image_url ||
-      "/logo-transparent.png"
-    );
-  }
-
-  function categoryMatches(product, category) {
-    if (category === "all") return true;
-
-    const readable = category.replaceAll("-", " ");
-
-    const text = `
-      ${product.name || ""}
-      ${product.category || ""}
-      ${product.category_slug || ""}
-      ${product.categories?.name || ""}
-      ${product.short_description || ""}
-      ${product.description || ""}
-    `.toLowerCase();
-
-    return text.includes(category.toLowerCase()) || text.includes(readable.toLowerCase());
+  function resetFilters() {
+    setSelectedCategory("All");
+    setSearchText("");
+    setSortType("default");
+    setPriceRange("all");
+    setAvailability("all");
+    navigate("/products");
   }
 
   const filteredProducts = useMemo(() => {
     let list = [...products];
 
-    if (search.trim()) {
-      const keyword = search.toLowerCase();
+    if (selectedCategory !== "All") {
+      list = list.filter(
+        (product) =>
+          String(product.category || "").toLowerCase() ===
+          selectedCategory.toLowerCase()
+      );
+    }
 
+    if (searchText.trim()) {
+      const text = searchText.toLowerCase();
+
+      list = list.filter(
+        (product) =>
+          String(product.name || "").toLowerCase().includes(text) ||
+          String(product.category || "").toLowerCase().includes(text) ||
+          String(product.short_description || "")
+            .toLowerCase()
+            .includes(text) ||
+          String(product.description || "").toLowerCase().includes(text)
+      );
+    }
+
+    if (priceRange !== "all") {
       list = list.filter((product) => {
-        const text = `
-          ${product.name || ""}
-          ${product.category || ""}
-          ${product.short_description || ""}
-          ${product.description || ""}
-          ${product.skin_type || ""}
-        `.toLowerCase();
+        const price = Number(product.price || 0);
 
-        return text.includes(keyword);
+        if (priceRange === "under-500") return price < 500;
+        if (priceRange === "500-1000") return price >= 500 && price <= 1000;
+        if (priceRange === "1000-2000") return price > 1000 && price <= 2000;
+        if (priceRange === "above-2000") return price > 2000;
+
+        return true;
       });
     }
 
-    list = list.filter((product) => categoryMatches(product, selectedCategory));
-
-    if (stockFilter === "in_stock") {
-      list = list.filter((product) => Number(product.stock || 0) > 0);
+    if (availability === "available") {
+      list = list.filter(
+        (product) =>
+          product.is_available !== false && Number(product.stock || 0) !== 0
+      );
     }
 
-    if (stockFilter === "sold_out") {
-      list = list.filter((product) => Number(product.stock || 0) <= 0);
+    if (availability === "sold-out") {
+      list = list.filter(
+        (product) =>
+          product.is_available === false || Number(product.stock || 0) === 0
+      );
     }
 
-    if (sort === "price_low") {
+    if (sortType === "low-high") {
       list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
     }
 
-    if (sort === "price_high") {
+    if (sortType === "high-low") {
       list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
     }
 
-    if (sort === "name") {
-      list.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
-    }
-
-    if (sort === "newest") {
-      list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    if (sortType === "name") {
+      list.sort((a, b) =>
+        String(a.name || "").localeCompare(String(b.name || ""))
+      );
     }
 
     return list;
-  }, [products, search, sort, stockFilter, selectedCategory, refreshState]);
-
-  function getPageTitle() {
-    if (selectedCategory === "all") return "Luxury Skincare Shop";
-
-    return selectedCategory
-      .replaceAll("-", " ")
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  }
-
-  function handleCart(product) {
-    const result = toggleProductInCart(product);
-    setRefreshState((prev) => prev + 1);
-
-    if (result.status === "added") {
-      showToast("Yeah! Added to cart successfully.");
-    } else {
-      showToast("Removed from cart.");
-    }
-  }
-
-  function handleWishlist(product) {
-    const result = toggleProductInWishlist(product);
-    setRefreshState((prev) => prev + 1);
-
-    if (result.status === "added") {
-      showToast("Yeah! Added to wishlist successfully.");
-    } else {
-      showToast("Removed from wishlist.");
-    }
-  }
-
-  function handleBuyNow(product) {
-    if (Number(product.stock || 0) <= 0) {
-      showToast("This product is sold out.");
-      return;
-    }
-
-    if (!isProductInCart(product.id)) {
-      toggleProductInCart(product);
-    }
-
-    showToast("Product added. Opening checkout...");
-    setTimeout(() => {
-      navigate("/checkout");
-    }, 600);
-  }
+  }, [
+    products,
+    selectedCategory,
+    searchText,
+    sortType,
+    priceRange,
+    availability,
+  ]);
 
   return (
     <>
@@ -210,171 +309,164 @@ export default function ProductsPage() {
 
       <main className="shop-lux-page">
         <section className="shop-lux-hero">
-          <div className="shop-lux-hero-text">
-            <span>Radhivya Collection</span>
-            <h1>{getPageTitle()}</h1>
-            <p>
-              Discover premium skincare products with a black-gold luxury shopping
-              experience. Click product image to view full details.
-            </p>
-          </div>
+          <span>Radhivya Shop</span>
+          <h1>Premium skincare collection</h1>
+          <p>
+            Explore cleansers, serums, moisturizers, masks, oils, lip care, body
+            care and complete beauty rituals with a premium shopping experience.
+          </p>
+        </section>
 
-          <div className="shop-lux-hero-card">
-            <div className="shop-lux-orb"></div>
-            <img
-              src="/logo-transparent.png"
-              alt="Radhivya"
-              onError={(e) => {
-                e.currentTarget.src = "/logo.png";
-              }}
+        <section className="shop-filter-panel">
+          <div className="filter-field search-field">
+            <label>Search Product</label>
+            <input
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search serum, cleanser, lip care..."
             />
           </div>
+
+          <div className="filter-field">
+            <label>Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => selectCategory(e.target.value)}
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-field">
+            <label>Price</label>
+            <select
+              value={priceRange}
+              onChange={(e) => setPriceRange(e.target.value)}
+            >
+              <option value="all">All Prices</option>
+              <option value="under-500">Under ₹500</option>
+              <option value="500-1000">₹500 - ₹1000</option>
+              <option value="1000-2000">₹1000 - ₹2000</option>
+              <option value="above-2000">Above ₹2000</option>
+            </select>
+          </div>
+
+          <div className="filter-field">
+            <label>Availability</label>
+            <select
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="available">Available</option>
+              <option value="sold-out">Sold Out</option>
+            </select>
+          </div>
+
+          <div className="filter-field">
+            <label>Sort</label>
+            <select
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value)}
+            >
+              <option value="default">Default</option>
+              <option value="low-high">Price: Low to High</option>
+              <option value="high-low">Price: High to Low</option>
+              <option value="name">Name A-Z</option>
+            </select>
+          </div>
+
+          <button className="reset-filter-btn" type="button" onClick={resetFilters}>
+            Reset
+          </button>
         </section>
 
-        <section className="shop-category-bar">
-          {categoryButtons.map(([label, value]) => (
-            <button
-              key={value}
-              className={selectedCategory === value ? "active" : ""}
-              onClick={() => changeCategory(value)}
-            >
-              {label}
-            </button>
-          ))}
+        <section className="shop-result-bar">
+          <span>{filteredProducts.length} products found</span>
+          <strong>
+            {selectedCategory === "All"
+              ? "All Categories"
+              : selectedCategory}
+          </strong>
         </section>
 
-        <section className="shop-lux-layout">
-          <aside className="shop-filter-panel">
-            <h2>Refine</h2>
+        {filteredProducts.length === 0 ? (
+          <section className="shop-empty">
+            <h2>No products found</h2>
+            <p>Try changing category, search text, price or availability.</p>
+            <button onClick={resetFilters}>Reset Filters</button>
+          </section>
+        ) : (
+          <section className="shop-product-grid">
+            {filteredProducts.map((product) => {
+              const inCart = cart.some((item) => item.id === product.id);
+              const inWishlist = wishlist.some((item) => item.id === product.id);
+              const isSoldOut =
+                product.is_available === false ||
+                Number(product.stock || 0) === 0;
 
-            <label>
-              Search
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search serum, cream..."
-              />
-            </label>
+              return (
+                <article className="shop-product-card" key={product.id}>
+                  <button
+                    className={`shop-heart ${inWishlist ? "active" : ""}`}
+                    onClick={() => toggleWishlist(product)}
+                    aria-label="Wishlist"
+                  >
+                    ♥
+                  </button>
 
-            <label>
-              Stock
-              <select value={stockFilter} onChange={(e) => setStockFilter(e.target.value)}>
-                <option value="all">All Products</option>
-                <option value="in_stock">In Stock</option>
-                <option value="sold_out">Sold Out</option>
-              </select>
-            </label>
+                  {isSoldOut && <div className="sold-out-ribbon">Sold Out</div>}
 
-            <label>
-              Sort
-              <select value={sort} onChange={(e) => setSort(e.target.value)}>
-                <option value="newest">Newest First</option>
-                <option value="price_low">Price Low to High</option>
-                <option value="price_high">Price High to Low</option>
-                <option value="name">Name A-Z</option>
-              </select>
-            </label>
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="shop-product-image"
+                  >
+                    <img src={getProductImage(product)} alt={product.name} />
+                  </Link>
 
-            <button
-              onClick={() => {
-                setSearch("");
-                setSort("newest");
-                setStockFilter("all");
-                setSearchParams({});
-              }}
-            >
-              Clear Filters
-            </button>
-          </aside>
+                  <div className="shop-product-content">
+                    <span>{product.category || "Skincare"}</span>
 
-          <section className="shop-products-area">
-            <div className="shop-toolbar">
-              <strong>{filteredProducts.length}</strong>
-              <span>products found</span>
-            </div>
+                    <h3>{product.name}</h3>
 
-            {loading && <div className="shop-state">Loading luxury products...</div>}
+                    <p>{product.short_description || product.description}</p>
 
-            {!loading && error && <div className="shop-state error">{error}</div>}
+                    <div className="shop-product-bottom">
+                      <strong>₹{product.price}</strong>
 
-            {!loading && !error && filteredProducts.length === 0 && (
-              <div className="shop-state">
-                <h2>No products found</h2>
-                <p>Add products from Admin Portal or choose another filter.</p>
-              </div>
-            )}
+                      {product.old_price && (
+                        <small className="old-price">₹{product.old_price}</small>
+                      )}
 
-            {!loading && !error && filteredProducts.length > 0 && (
-              <div className="shop-product-grid">
-                {filteredProducts.map((product) => {
-                  const inWishlist = isProductInWishlist(product.id);
-                  const inCart = isProductInCart(product.id);
-                  const soldOut = Number(product.stock || 0) <= 0;
+                      <small>{isSoldOut ? "Sold Out" : "Available"}</small>
+                    </div>
 
-                  return (
-                    <article className="shop-product-card" key={product.id}>
-                      <div className="shop-badges">
-                        {product.is_bestseller && <span>Bestseller</span>}
-                        {product.is_featured && <span>Featured</span>}
-                        {product.is_new_arrival && <span>New</span>}
-                        {soldOut && <span className="sold">Sold Out</span>}
-                      </div>
-
+                    <div className="shop-product-actions">
                       <button
-                        className={`shop-heart ${inWishlist ? "active" : ""}`}
-                        onClick={() => handleWishlist(product)}
+                        onClick={() => buyNow(product)}
+                        disabled={isSoldOut}
                       >
-                        {inWishlist ? "♥" : "♡"}
+                        Buy Now
                       </button>
 
-                      <Link to={`/product/${product.id}`} className="shop-product-image">
-                        <img src={getProductImage(product)} alt={product.name} />
-                      </Link>
-
-                      <div className="shop-product-info">
-                        <small>{product.category || "Skincare"}</small>
-
-                        <h3>{product.name}</h3>
-
-                        <p>
-                          {product.short_description ||
-                            product.description ||
-                            "Premium skincare by Radhivya."}
-                        </p>
-
-                        <div className="shop-meta">
-                          <span>{product.skin_type || "All Skin Types"}</span>
-                          <span>{soldOut ? "Sold Out" : `Stock ${product.stock}`}</span>
-                        </div>
-
-                        <div className="shop-price">
-                          <strong>₹{Number(product.price || 0).toFixed(0)}</strong>
-                          {product.old_price && (
-                            <del>₹{Number(product.old_price).toFixed(0)}</del>
-                          )}
-                        </div>
-
-                        <div className="shop-actions">
-                          <button
-                            onClick={() => handleCart(product)}
-                            disabled={soldOut}
-                            className={inCart ? "remove" : ""}
-                          >
-                            {soldOut ? "Sold Out" : inCart ? "Remove Cart" : "Add Cart"}
-                          </button>
-
-                          <button onClick={() => handleBuyNow(product)} disabled={soldOut}>
-                            Buy Now
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
+                      <button
+                        className="secondary"
+                        onClick={() => addToCart(product)}
+                        disabled={isSoldOut}
+                      >
+                        {inCart ? "Remove Cart" : "Add Cart"}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </section>
-        </section>
+        )}
       </main>
 
       <Footer />
