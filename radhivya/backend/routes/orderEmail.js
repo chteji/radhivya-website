@@ -123,11 +123,18 @@ function createInvoicePdfBuffer(order) {
         .fontSize(10)
         .font("Helvetica")
         .fillColor("#4f4336")
-        .text(`Name: ${safeText(customer.full_name || getCustomerName(order))}`, 42, 190)
+        .text(
+          `Name: ${safeText(customer.full_name || getCustomerName(order))}`,
+          42,
+          190
+        )
         .text(`Email: ${safeText(customer.email || order.customer_email)}`, 42, 208)
         .text(`Phone: ${safeText(customer.phone)}`, 42, 226)
         .text(
-          `Address: ${safeText(customer.address)}, ${safeText(customer.city, "")}, ${safeText(customer.state, "")}, ${safeText(customer.pincode, "")}`,
+          `Address: ${safeText(customer.address)}, ${safeText(
+            customer.city,
+            ""
+          )}, ${safeText(customer.state, "")}, ${safeText(customer.pincode, "")}`,
           42,
           244,
           { width: 260 }
@@ -269,7 +276,7 @@ function createInvoicePdfBuffer(order) {
 }
 
 /* =========================
-   PREMIUM GRAPHIC EMAIL HTML
+   PREMIUM MOBILE FRIENDLY EMAIL HTML
 ========================= */
 
 function createOrderEmailHtml(order) {
@@ -298,8 +305,8 @@ function createOrderEmailHtml(order) {
               <td style="padding:14px 0;border-bottom:1px solid rgba(200,155,92,0.18);">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   <tr>
-                    <td style="width:54px;">
-                      <div style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#15110d,#2a2118);text-align:center;line-height:46px;color:#f2d6a3;font-size:22px;">
+                    <td class="product-icon-cell" style="width:54px;">
+                      <div class="product-icon" style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#15110d,#2a2118);text-align:center;line-height:46px;color:#f2d6a3;font-size:22px;">
                         ✨
                       </div>
                     </td>
@@ -332,20 +339,114 @@ function createOrderEmailHtml(order) {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+      <style>
+        @media only screen and (max-width: 620px) {
+          .email-wrapper {
+            padding: 18px 8px !important;
+          }
+
+          .email-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 24px !important;
+          }
+
+          .hero-section {
+            padding: 32px 18px 30px !important;
+          }
+
+          .brand-logo {
+            width: 86px !important;
+            height: 86px !important;
+            line-height: 86px !important;
+            border-radius: 26px !important;
+          }
+
+          .brand-logo span {
+            font-size: 44px !important;
+          }
+
+          .brand-title {
+            font-size: 40px !important;
+          }
+
+          .hero-title {
+            font-size: 32px !important;
+            line-height: 1.15 !important;
+          }
+
+          .body-section {
+            padding: 28px 18px !important;
+          }
+
+          .order-card {
+            padding: 22px 16px !important;
+            border-radius: 26px !important;
+          }
+
+          .mobile-block {
+            display: block !important;
+            width: 100% !important;
+            text-align: left !important;
+            padding-bottom: 16px !important;
+          }
+
+          .mobile-total {
+            text-align: left !important;
+          }
+
+          .mobile-stat {
+            display: block !important;
+            width: 100% !important;
+            padding: 7px 0 !important;
+          }
+
+          .product-icon-cell {
+            width: 44px !important;
+          }
+
+          .product-icon {
+            width: 38px !important;
+            height: 38px !important;
+            line-height: 38px !important;
+            border-radius: 14px !important;
+          }
+
+          .delivery-step {
+            display: block !important;
+            width: 100% !important;
+            padding: 10px 0 !important;
+          }
+
+          .section-title {
+            font-size: 26px !important;
+          }
+
+          .invoice-card {
+            padding: 28px 16px !important;
+            border-radius: 26px !important;
+          }
+
+          .footer-section {
+            padding: 28px 16px !important;
+          }
+        }
+      </style>
     </head>
 
     <body style="margin:0;padding:0;background:#ead8bd;font-family:Arial,Helvetica,sans-serif;color:#15110d;">
-      <div style="width:100%;padding:42px 14px;background:linear-gradient(135deg,#fffaf3 0%,#f5ead8 42%,#d7b37a 100%);">
+      <div class="email-wrapper" style="width:100%;padding:42px 14px;background:linear-gradient(135deg,#fffaf3 0%,#f5ead8 42%,#d7b37a 100%);">
 
-        <div style="max-width:780px;margin:0 auto;border-radius:44px;overflow:hidden;box-shadow:0 45px 120px rgba(21,17,13,0.28);background:#fffaf3;">
+        <div class="email-container" style="max-width:780px;width:100%;margin:0 auto;border-radius:44px;overflow:hidden;box-shadow:0 45px 120px rgba(21,17,13,0.28);background:#fffaf3;">
 
-          <div style="background:linear-gradient(135deg,#050403 0%,#15110d 56%,#2a2118 100%);padding:48px 34px 42px;text-align:center;">
+          <div class="hero-section" style="background:linear-gradient(135deg,#050403 0%,#15110d 56%,#2a2118 100%);padding:48px 34px 42px;text-align:center;">
 
-            <div style="margin:0 auto 22px;width:112px;height:112px;border-radius:36px;background:linear-gradient(145deg,#f2d6a3,#c89b5c 55%,#15110d);border:1px solid rgba(242,214,163,0.32);box-shadow:0 25px 70px rgba(0,0,0,0.34);text-align:center;line-height:112px;">
+            <div class="brand-logo" style="margin:0 auto 22px;width:112px;height:112px;border-radius:36px;background:linear-gradient(145deg,#f2d6a3,#c89b5c 55%,#15110d);border:1px solid rgba(242,214,163,0.32);box-shadow:0 25px 70px rgba(0,0,0,0.34);text-align:center;line-height:112px;">
               <span style="font-size:56px;color:#15110d;font-weight:900;font-family:Georgia,serif;">R</span>
             </div>
 
-            <div style="font-size:54px;line-height:1;font-family:Georgia,serif;font-weight:900;color:#f2d6a3;letter-spacing:-1px;">
+            <div class="brand-title" style="font-size:54px;line-height:1;font-family:Georgia,serif;font-weight:900;color:#f2d6a3;letter-spacing:-1px;">
               Radhivya
             </div>
 
@@ -358,7 +459,7 @@ function createOrderEmailHtml(order) {
                 ✨ Order Successfully Placed ✨
               </div>
 
-              <h1 style="margin:24px 0 14px;color:#fffaf3;font-size:42px;line-height:1.12;font-family:Georgia,serif;font-weight:900;">
+              <h1 class="hero-title" style="margin:24px 0 14px;color:#fffaf3;font-size:42px;line-height:1.12;font-family:Georgia,serif;font-weight:900;">
                 Your luxury glow ritual is confirmed
               </h1>
 
@@ -391,7 +492,7 @@ function createOrderEmailHtml(order) {
             </table>
           </div>
 
-          <div style="padding:40px 34px;background:#fffaf3;">
+          <div class="body-section" style="padding:40px 34px;background:#fffaf3;">
 
             <p style="margin:0 0 12px;color:#7a6a58;font-size:17px;line-height:1.8;">
               Hello <strong style="color:#15110d;">${customerName}</strong>,
@@ -401,11 +502,11 @@ function createOrderEmailHtml(order) {
               Your order has been placed successfully. We have attached your invoice PDF with this email. You can also track your order and view invoice from your Radhivya customer profile.
             </p>
 
-            <div style="background:linear-gradient(135deg,#15110d,#2a2118);border-radius:34px;padding:30px;margin:0 0 30px;box-shadow:0 28px 80px rgba(21,17,13,0.24);">
+            <div class="order-card" style="background:linear-gradient(135deg,#15110d,#2a2118);border-radius:34px;padding:30px;margin:0 0 30px;box-shadow:0 28px 80px rgba(21,17,13,0.24);">
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td style="vertical-align:top;">
+                  <td class="mobile-block" style="vertical-align:top;">
                     <div style="color:#c89b5c;font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;margin-bottom:9px;">
                       Order Number
                     </div>
@@ -415,7 +516,7 @@ function createOrderEmailHtml(order) {
                     </div>
                   </td>
 
-                  <td style="vertical-align:top;text-align:right;">
+                  <td class="mobile-block mobile-total" style="vertical-align:top;text-align:right;">
                     <div style="display:inline-block;background:#f2d6a3;color:#15110d;border-radius:22px;padding:16px 20px;min-width:125px;text-align:center;">
                       <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:900;color:#7a4f23;">
                         Grand Total
@@ -433,14 +534,14 @@ function createOrderEmailHtml(order) {
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td style="width:50%;padding:7px;">
+                  <td class="mobile-stat" style="width:50%;padding:7px;">
                     <div style="background:rgba(255,250,243,0.08);border:1px solid rgba(242,214,163,0.16);border-radius:22px;padding:18px;">
                       <div style="color:#c89b5c;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Payment</div>
                       <div style="color:#fffaf3;font-size:17px;font-weight:900;">${order.payment_status || "Confirmed"}</div>
                     </div>
                   </td>
 
-                  <td style="width:50%;padding:7px;">
+                  <td class="mobile-stat" style="width:50%;padding:7px;">
                     <div style="background:rgba(255,250,243,0.08);border:1px solid rgba(242,214,163,0.16);border-radius:22px;padding:18px;">
                       <div style="color:#c89b5c;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Items</div>
                       <div style="color:#fffaf3;font-size:17px;font-weight:900;">${itemCount} item${itemCount === 1 ? "" : "s"}</div>
@@ -449,14 +550,14 @@ function createOrderEmailHtml(order) {
                 </tr>
 
                 <tr>
-                  <td style="width:50%;padding:7px;">
+                  <td class="mobile-stat" style="width:50%;padding:7px;">
                     <div style="background:rgba(255,250,243,0.08);border:1px solid rgba(242,214,163,0.16);border-radius:22px;padding:18px;">
                       <div style="color:#c89b5c;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Main Product</div>
                       <div style="color:#fffaf3;font-size:17px;font-weight:900;">${firstProduct}</div>
                     </div>
                   </td>
 
-                  <td style="width:50%;padding:7px;">
+                  <td class="mobile-stat" style="width:50%;padding:7px;">
                     <div style="background:rgba(255,250,243,0.08);border:1px solid rgba(242,214,163,0.16);border-radius:22px;padding:18px;">
                       <div style="color:#c89b5c;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Delivery</div>
                       <div style="color:#fffaf3;font-size:17px;font-weight:900;">Within 7 days</div>
@@ -467,7 +568,7 @@ function createOrderEmailHtml(order) {
             </div>
 
             <div style="background:#fffaf3;border:1px solid rgba(200,155,92,0.26);border-radius:30px;padding:26px;margin-bottom:30px;box-shadow:0 18px 55px rgba(21,17,13,0.08);">
-              <div style="color:#15110d;font-size:28px;line-height:1.2;font-family:Georgia,serif;font-weight:900;margin-bottom:18px;">
+              <div class="section-title" style="color:#15110d;font-size:28px;line-height:1.2;font-family:Georgia,serif;font-weight:900;margin-bottom:18px;">
                 Your selected skincare ritual
               </div>
 
@@ -492,29 +593,29 @@ function createOrderEmailHtml(order) {
                   Delivery Journey
                 </div>
 
-                <h2 style="margin:10px 0 0;color:#15110d;font-size:32px;line-height:1.1;font-family:Georgia,serif;">
+                <h2 class="section-title" style="margin:10px 0 0;color:#15110d;font-size:32px;line-height:1.1;font-family:Georgia,serif;">
                   Your 7-day glow delivery path
                 </h2>
               </div>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td align="center" style="padding:8px;">
+                  <td class="delivery-step" align="center" style="padding:8px;">
                     <div style="width:62px;height:62px;border-radius:50%;background:#15110d;color:#f2d6a3;text-align:center;line-height:62px;font-size:24px;font-weight:900;margin:0 auto;">✓</div>
                     <div style="color:#15110d;font-weight:900;font-size:13px;margin-top:10px;">Placed</div>
                   </td>
 
-                  <td align="center" style="padding:8px;">
+                  <td class="delivery-step" align="center" style="padding:8px;">
                     <div style="width:62px;height:62px;border-radius:50%;background:#f2d6a3;color:#15110d;text-align:center;line-height:62px;font-size:22px;font-weight:900;margin:0 auto;">2</div>
                     <div style="color:#15110d;font-weight:900;font-size:13px;margin-top:10px;">Confirmed</div>
                   </td>
 
-                  <td align="center" style="padding:8px;">
+                  <td class="delivery-step" align="center" style="padding:8px;">
                     <div style="width:62px;height:62px;border-radius:50%;background:#f2d6a3;color:#15110d;text-align:center;line-height:62px;font-size:22px;font-weight:900;margin:0 auto;">3</div>
                     <div style="color:#15110d;font-weight:900;font-size:13px;margin-top:10px;">Packed</div>
                   </td>
 
-                  <td align="center" style="padding:8px;">
+                  <td class="delivery-step" align="center" style="padding:8px;">
                     <div style="width:62px;height:62px;border-radius:50%;background:#f2d6a3;color:#15110d;text-align:center;line-height:62px;font-size:22px;font-weight:900;margin:0 auto;">4</div>
                     <div style="color:#15110d;font-weight:900;font-size:13px;margin-top:10px;">Delivered</div>
                   </td>
@@ -522,13 +623,13 @@ function createOrderEmailHtml(order) {
               </table>
             </div>
 
-            <div style="text-align:center;background:linear-gradient(135deg,#15110d,#2a2118);border-radius:34px;padding:34px 24px;margin-bottom:30px;">
+            <div class="invoice-card" style="text-align:center;background:linear-gradient(135deg,#15110d,#2a2118);border-radius:34px;padding:34px 24px;margin-bottom:30px;">
 
               <div style="width:76px;height:76px;border-radius:24px;background:#f2d6a3;color:#15110d;line-height:76px;text-align:center;font-size:34px;margin:0 auto 18px;">
                 🧾
               </div>
 
-              <h2 style="margin:0 0 12px;color:#f2d6a3;font-size:32px;line-height:1.15;font-family:Georgia,serif;">
+              <h2 class="section-title" style="margin:0 0 12px;color:#f2d6a3;font-size:32px;line-height:1.15;font-family:Georgia,serif;">
                 Your invoice PDF is attached
               </h2>
 
@@ -554,7 +655,7 @@ function createOrderEmailHtml(order) {
             </div>
           </div>
 
-          <div style="background:#090705;text-align:center;padding:34px 24px;">
+          <div class="footer-section" style="background:#090705;text-align:center;padding:34px 24px;">
             <div style="color:#f2d6a3;font-size:26px;font-weight:900;font-family:Georgia,serif;">
               Radhivya
             </div>

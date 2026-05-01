@@ -147,3 +147,462 @@ select {
     width: 100%;
   }
 }
+
+/* =========================================================
+   RADHIVYA GLOBAL MOBILE RESPONSIVE FIX
+   Paste at bottom of src/index.css or src/App.css
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* Prevent big headings from breaking mobile */
+h1,
+h2,
+h3,
+h4,
+p,
+span,
+strong,
+a,
+button {
+  overflow-wrap: break-word;
+}
+
+/* General mobile containers */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  main {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  section {
+    max-width: 100%;
+  }
+
+  /* Header / Navbar */
+  .site-header,
+  .header,
+  .main-header,
+  .navbar,
+  .nav-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .header-inner,
+  .navbar-inner,
+  .nav-inner {
+    width: 100% !important;
+    padding: 14px 14px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    justify-content: center !important;
+  }
+
+  .logo,
+  .brand-logo,
+  .header-logo,
+  .nav-logo {
+    max-width: 170px !important;
+    height: auto !important;
+  }
+
+  nav,
+  .nav-links,
+  .navbar-links,
+  .header-links {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  nav a,
+  .nav-links a,
+  .navbar-links a,
+  .header-links a {
+    font-size: 14px !important;
+    padding: 8px 10px !important;
+    white-space: nowrap;
+  }
+
+  .topbar,
+  .top-bar,
+  .announcement-bar {
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+    text-align: center !important;
+  }
+
+  /* Hero sections */
+  .hero,
+  .home-hero,
+  .about-hero,
+  .shop-hero,
+  .new-arrivals-hero,
+  .contact-hero {
+    min-height: auto !important;
+    padding: 42px 16px !important;
+    text-align: center !important;
+  }
+
+  .hero h1,
+  .home-hero h1,
+  .about-hero h1,
+  .shop-hero h1,
+  .new-arrivals-hero h1,
+  .contact-hero h1 {
+    font-size: clamp(42px, 13vw, 64px) !important;
+    line-height: 0.95 !important;
+    max-width: 100% !important;
+  }
+
+  .hero p,
+  .home-hero p,
+  .about-hero p,
+  .shop-hero p,
+  .new-arrivals-hero p,
+  .contact-hero p {
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+    max-width: 100% !important;
+  }
+
+  /* Any two-column layouts become one column */
+  .home-grid,
+  .about-grid,
+  .shop-layout,
+  .product-detail-layout,
+  .checkout-layout,
+  .payment-layout,
+  .profile-layout,
+  .contact-layout,
+  .admin-layout,
+  .staff-layout,
+  .dashboard-layout,
+  .cart-layout,
+  .wishlist-layout,
+  .invoice-layout,
+  .signup-shell,
+  .auth-shell {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 18px !important;
+  }
+
+  /* Cards */
+  .card,
+  .product-card,
+  .checkout-card,
+  .payment-card,
+  .profile-main-card,
+  .profile-sidebar,
+  .admin-card,
+  .staff-card,
+  .auth-card,
+  .signup-form-panel,
+  .signup-brand-panel,
+  .invoice-card,
+  .contact-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px !important;
+    padding: 22px !important;
+  }
+
+  /* Product grids */
+  .products-grid,
+  .product-grid,
+  .shop-products,
+  .new-arrivals-grid,
+  .wishlist-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+    width: 100% !important;
+  }
+
+  .product-card img,
+  .product-image,
+  .product-detail-image {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 420px !important;
+    object-fit: contain !important;
+  }
+
+  /* Forms */
+  form,
+  .form,
+  .signup-form,
+  .auth-form,
+  .checkout-form,
+  .payment-form,
+  .contact-form,
+  .profile-edit-form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .signup-grid,
+  .auth-grid,
+  .checkout-grid,
+  .payment-form-grid,
+  .profile-edit-grid,
+  .admin-form-grid,
+  .staff-form-grid,
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 16px !important;
+  }
+
+  button {
+    max-width: 100%;
+  }
+
+  /* Profile tabs */
+  .profile-inner-nav {
+    width: 100% !important;
+    overflow-x: auto !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+    scrollbar-width: none;
+  }
+
+  .profile-inner-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-inner-nav button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .profile-container,
+  .checkout-shell,
+  .payment-shell,
+  .invoice-shell,
+  .admin-container,
+  .staff-container,
+  .shop-shell,
+  .product-detail-shell,
+  .contact-shell {
+    width: min(100% - 20px, 1200px) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .profile-sidebar {
+    position: relative !important;
+    top: auto !important;
+  }
+
+  .profile-order-history-layout,
+  .profile-order-history-card,
+  .profile-order-detail,
+  .profile-order-list {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Checkout / payment summary should not stick on mobile */
+  .checkout-summary,
+  .payment-summary {
+    position: relative !important;
+    top: auto !important;
+  }
+
+  /* Admin/staff sidebar */
+  .admin-sidebar,
+  .staff-sidebar,
+  .dashboard-sidebar {
+    width: 100% !important;
+    min-height: auto !important;
+    position: relative !important;
+    top: auto !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 16px !important;
+  }
+
+  .admin-sidebar button,
+  .staff-sidebar button,
+  .dashboard-sidebar button,
+  .admin-sidebar a,
+  .staff-sidebar a {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    font-size: 13px !important;
+    padding: 10px 12px !important;
+  }
+
+  .admin-main,
+  .staff-main,
+  .dashboard-main {
+    width: 100% !important;
+    padding: 16px !important;
+  }
+
+  /* Tables become scrollable */
+  table {
+    width: 100% !important;
+  }
+
+  .table-wrap,
+  .admin-table,
+  .staff-table,
+  .orders-table,
+  .customers-table,
+  .payments-table {
+    overflow-x: auto !important;
+    width: 100% !important;
+    display: block !important;
+  }
+
+  /* Invoice mobile */
+  .invoice-page {
+    padding: 24px 10px !important;
+  }
+
+  .invoice-paper,
+  .invoice-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    padding: 20px !important;
+  }
+
+  /* Chatbot mobile */
+  .chatbot,
+  .chatbot-box,
+  .chatbot-panel {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    right: 12px !important;
+    left: 12px !important;
+    bottom: 88px !important;
+  }
+
+  .chatbot-toggle,
+  .chatbot-button,
+  .bot-toggle {
+    right: 16px !important;
+    bottom: 18px !important;
+  }
+
+  /* Background animations should not cover content */
+  .premium-3d-bg,
+  .animated-background,
+  .luxury-bg,
+  .premium-bg {
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+  .header-inner,
+  .navbar-inner,
+  .nav-inner {
+    padding: 12px 8px !important;
+  }
+
+  nav a,
+  .nav-links a,
+  .navbar-links a,
+  .header-links a {
+    font-size: 13px !important;
+    padding: 7px 8px !important;
+  }
+
+  .hero h1,
+  .home-hero h1,
+  .about-hero h1,
+  .shop-hero h1,
+  .new-arrivals-hero h1,
+  .contact-hero h1 {
+    font-size: 44px !important;
+  }
+
+  .checkout-header h1,
+  .payment-header h1,
+  .profile-header h1,
+  .invoice-header h1,
+  .signup-form h2,
+  .auth-form h2 {
+    font-size: 42px !important;
+    line-height: 1 !important;
+  }
+
+  .checkout-card,
+  .payment-card,
+  .profile-main-card,
+  .profile-sidebar,
+  .signup-form-panel,
+  .signup-brand-panel,
+  .auth-card {
+    padding: 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .product-card {
+    padding: 16px !important;
+  }
+
+  .product-card h3,
+  .product-title {
+    font-size: 20px !important;
+  }
+
+  .checkout-total-box .grand-total strong,
+  .payment-grand-total strong {
+    font-size: 26px !important;
+  }
+}

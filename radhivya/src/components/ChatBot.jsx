@@ -124,8 +124,8 @@ export default function ChatBot() {
           <span className="bot-smile"></span>
         </span>
 
-        <span className="bot-thumb">👍</span>
-        <span className="bot-spark">✨</span>
+        <span className="bot-thumb"></span>
+        <span className="bot-spark"></span>
       </button>
 
       {open && (
